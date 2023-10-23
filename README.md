@@ -5,7 +5,7 @@ This repository contains the code and documentation for an astronomical simulati
 
 ## Project Team
 - Levi van Es - s2115409
-- Andres
+- Andres Presa - s3643751
 - Esther
 
 ## Table of Contents
