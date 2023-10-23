@@ -12,7 +12,7 @@ This repository contains the code and documentation for an astronomical simulati
 - [Introduction](#introduction)
 - [Simulation Details](#simulation-details)
 - [Installation](#installation)
-- [Project Setup](#Project-Setup)
+- [Project Setup](#project-setup)
 - [Results](#results)
 - [Contributing](#contributing)
 - [License](#license)
@@ -83,6 +83,7 @@ With the aforementioned constraints, we can now design the simulation. The situa
 
 1. **Hydrodynamics**: The hydrodynamics of the ejected atmosphere and its interaction with the planets surface (optionally also the moon's surface)
 2. **Gravitational**: The gravitational interaction between the planet, the moon, and the ejected atmosphere
+3. **Hydro-Gravity Bridge**: The coupling of the hydrodynamics and gravitational interaction
 
 These two types of physics can be simulated separately. The hydrodynamics can be simulated using the hydrodynamics module of AMUSE. The gravitational interaction can be simulated using the gravitational module of AMUSE. However, because the hydrodynamics and gravitational interaction are coupled, we will have to combine the two simulations. This can be done by using the bridge module of AMUSE. The bridge module allows us to combine two simulations and exchange information between them. 
 
@@ -120,5 +121,23 @@ The gravitational interaction between the planet, the moon, and the ejected atmo
 1. **The celestial bodies**: The celestial bodies that are being simulated (in this case the planet, the moon, and the ejected atmosphere)
 2. **The initial conditions**: The initial conditions of the celestial bodies i.e. Masses, positions, velocities, etc.
 
+Applying the aforementioned steps to our simulation, we get the following:
 
+1. **The celestial bodies**: The celestial bodies in this problem are just the earth, moon and host star. The earth and moon can be represented as SPH particles and the host star can be represented as a point particle. Gravitational between these gravity and SPH particles is solved in a later step through the Hydro-Gravity bridge<br>
 
+2. **The initial conditions**: The initial conditions of the planet can be obtained from the MESA stellar model object. The initial conditions of the moon can be constructed by hand through the use of the ``new_sph_particle()`` function from AMUSE. This particle is initialized to have parameters (position,velocity, mass, radius) similar to that of a/the moon. 
+
+#### Hydro-Gravity Bridge
+
+The Hydro-Gravity Bridge is the magic that combines N-body gravitaitonal effects with the fluid-like behaviour of the atmosphere. The bridge works by coupling the two simulations and exchanging information between them. The bridge allows us to simulate the hydrodynamics of the ejected atmosphere and its interaction with the planet's surface and the gravitational interaction between the planet, the moon, and the ejected atmosphere. To get the bridge to work, we will have to define the following:
+
+1. **The bridge**: The bridge that couples the hydrodynamics and gravitational interaction
+2. **The coupling parameters**: The coupling parameters that define the coupling between the hydrodynamics and gravitational interaction
+
+Applying the aforementioned steps to our simulation, we get the following:
+
+1. **The bridge**: The bridge can be constructed using the ``bridge()`` function from AMUSE. This function allows us to construct a bridge between two simulations. The function takes the two simulations as input and returns a bridge object. The bridge object can then be used to couple the two simulations. The direction this bridge works in is very important for the runtime and carefull thought needs to go into the significance of the direction of the bridge. Since the atmosphere likely has a marginal impact on gravitational effects it is likely not needed to couple the hydro to the gravity. Because the gravity likely has a large effect on the behaviour of the hydro code this bridge direction is very significant and should not be omitted <br>
+
+2. **The coupling parameters**: The coupling parameters are the parameters that define the coupling between the hydrodynamics and gravitational interaction. These parameters include the coupling time, the coupling radius, etc. These parameters are less trivial and some thought needs to go into these parameters to ensure the coupling is done correctly and for the code to even run.
+
+<!-- Say something about how we chose these coupling parameters> 
