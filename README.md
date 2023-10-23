@@ -4,7 +4,7 @@
 This repository contains the code and documentation for an astronomical simulation project that aims to simulate the ejection of a planet's atmosphere and the subsequent capture of that atmosphere by the planet's moon. The project is being conducted as part of the fulfillment of the AMUSE (Astronomy Multi-purpose Software Environment) course requirements.
 
 ## 1.1. Project Team
-- Levi van Es - s2115409
+- Levi van Es - s2115409  
 - Andres Presa - s3643751
 - Esther
 
