@@ -1,27 +1,43 @@
-# Astronomical Simulation Project
+# 1. Astronomical Simulation Project
 
 
 This repository contains the code and documentation for an astronomical simulation project that aims to simulate the ejection of a planet's atmosphere and the subsequent capture of that atmosphere by the planet's moon. The project is being conducted as part of the fulfillment of the AMUSE (Astronomy Multi-purpose Software Environment) course requirements.
 
-## Project Team
+## 1.1. Project Team
 - Levi van Es - s2115409
 - Andres Presa - s3643751
 - Esther
 
-## Table of Contents
-- [Introduction](#introduction)
-- [Simulation Details](#simulation-details)
-- [Installation](#installation)
-- [Project Setup](#project-setup)
-- [Results](#results)
-- [Contributing](#contributing)
-- [License](#license)
+## 1.2. Table of Contents
+- [1. Astronomical Simulation Project](#1-astronomical-simulation-project)
+  - [1.1. Project Team](#11-project-team)
+  - [1.2. Table of Contents](#12-table-of-contents)
+  - [1.3. Introduction](#13-introduction)
+  - [1.4. Simulation Details](#14-simulation-details)
+  - [1.5. Installation](#15-installation)
+  - [1.6. Project Setup](#16-project-setup)
+    - [1.6.1. Degrees of Freedom](#161-degrees-of-freedom)
+    - [1.6.2. Constraints](#162-constraints)
+  - [1.7. Simulation Design](#17-simulation-design)
+    - [1.7.1. Hydrodynamics](#171-hydrodynamics)
+    - [1.7.2. Gravitational Interaction](#172-gravitational-interaction)
+    - [1.7.3. Hydro-Gravity Bridge](#173-hydro-gravity-bridge)
+  - [1.8. Implementing the Simulation](#18-implementing-the-simulation)
+    - [1.8.1. Simulating the MESA model](#181-simulating-the-mesa-model)
+    - [1.8.2. Importing the MESA model into AMUSE](#182-importing-the-mesa-model-into-amuse)
+    - [1.8.3. Making the Moon and the Planet](#183-making-the-moon-and-the-planet)
+    - [1.8.4. Setting up the Hydrodynamics](#184-setting-up-the-hydrodynamics)
+    - [1.8.5. Setting up the Gravity](#185-setting-up-the-gravity)
+    - [1.8.6. Coupling the Hydrodynamics and Gravity](#186-coupling-the-hydrodynamics-and-gravity)
+    - [1.8.7. Running the Simulation](#187-running-the-simulation)
+  - [1.9. Exploring different scenarios](#19-exploring-different-scenarios)
+  - [1.10. Results](#110-results)
 
-## Introduction
+## 1.3. Introduction
 
 The goal of this project is to develop an astronomical simulation that models the fascinating phenomenon of a planet's atmosphere being ejected and subsequently captured by its moon. Through this simulation, we aim to explore the dynamics and consequences of such an event in a celestial system and the likelihood of such an event occurring for a given set of parameters. The number 
 
-## Simulation Details
+## 1.4. Simulation Details
 
 Our simulation is based on the AMUSE framework, a versatile tool for astrophysical simulations. It uses numerical methods and principles of astrophysics to model the complex interactions between celestial bodies. Here are some key details of the simulation:
 
@@ -30,7 +46,7 @@ Our simulation is based on the AMUSE framework, a versatile tool for astrophysic
 - **Simulation Scenarios**: Ejection of the planet's atmosphere and capture by the moon
 - **Parameters**: [List important parameters here]
 
-## Installation
+## 1.5. Installation
 
 To setup all dependencies for your venv, follow these steps:
 
@@ -51,11 +67,11 @@ To setup all dependencies for your venv, follow these steps:
 
 4. startup the AMUSE environment:
 
-## Project Setup
+## 1.6. Project Setup
 
 Before starting the construction of the simulation, we first conducted some research to understand the phenomenon of a planet's atmosphere being ejected and captured by its moon. We also explored the AMUSE framework and its capabilities to determine the best approach to simulate the phenomenon. 
 
-#### Degrees of Freedom
+### 1.6.1. Degrees of Freedom
 A good way to frame the problem is to list the free parameters of the simulation. These are the parameters that can be varied to explore the dynamics of the system and the consequences of the phenomenon. Here are the free parameters of our simulation:
 
 1. **Mass of the planet**: The mass of the planet from which the atmosphere is ejected
@@ -68,7 +84,7 @@ A good way to frame the problem is to list the free parameters of the simulation
 
 Looking at these parameters we immediately notice that there is a lot of freedom in the simulation. However, because there are so many parameters, it is not feasible to explore the entire parameter space. Therefore, we will focus on a few key parameters and explore the dynamics of the system for different values of these parameters. To do this we will have to constrain the other parameters.
 
-#### Constraints
+### 1.6.2. Constraints
 To constrain the parameters of the simulation, we will use the following assumptions:
 
 1. Constrain the mass of the planet to be similar to that of Earth
@@ -78,7 +94,7 @@ To constrain the parameters of the simulation, we will use the following assumpt
 5. Constrain the location of the ejected atmosphere to be uniform across the surface of the planet (for initial tests)
 
 
-## Simulation Design
+## 1.7. Simulation Design
 With the aforementioned constraints, we can now design the simulation. The situation requires two types of physics. 
 
 1. **Hydrodynamics**: The hydrodynamics of the ejected atmosphere and its interaction with the planets surface (optionally also the moon's surface)
@@ -89,7 +105,7 @@ These two types of physics can be simulated separately. The hydrodynamics can be
 
 This kind of coupling is not trivial and requires some experimentation. Therefore, we will first simulate the hydrodynamics of the ejected atmosphere and its interaction with the planet's surface. Once we have a working simulation, we will add the gravitational interaction with the moon. 
 
-#### Hydrodynamics
+### 1.7.1. Hydrodynamics
 The hydrodynamics of the ejected atmosphere and its interaction with the planet's surface can be simulated using the hydrodynamics module of AMUSE. The hydrodynamics module allows us to simulate the hydrodynamics of a fluid and its interaction with a solid surface. The module uses the Smoothed Particle Hydrodynamics (SPH) method to simulate the fluid. To get the hydrodynamics module to work, we will have to define the following:
 
 1. **The fluid**: The fluid that is being simulated (in this case the ejected atmosphere)
@@ -115,7 +131,7 @@ Applying the aforementioned steps to our simulation, we get the following:
 
 
 
-#### Gravitational Interaction
+### 1.7.2. Gravitational Interaction
 The gravitational interaction between the planet, the moon, and the ejected atmosphere can be simulated using the gravitational module of AMUSE. The gravitational module allows us to simulate the gravitational interaction between celestial bodies. The module uses the N-body method to simulate the gravitational interaction. To get the gravitational module to work, we will have to define the following:
 
 1. **The celestial bodies**: The celestial bodies that are being simulated (in this case the planet, the moon, and the ejected atmosphere)
@@ -127,7 +143,7 @@ Applying the aforementioned steps to our simulation, we get the following:
 
 2. **The initial conditions**: The initial conditions of the planet can be obtained from the MESA stellar model object. The initial conditions of the moon can be constructed by hand through the use of the ``new_sph_particle()`` function from AMUSE. This particle is initialized to have parameters (position,velocity, mass, radius) similar to that of a/the moon. 
 
-#### Hydro-Gravity Bridge
+### 1.7.3. Hydro-Gravity Bridge
 
 The Hydro-Gravity Bridge is the magic that combines N-body gravitaitonal effects with the fluid-like behaviour of the atmosphere. The bridge works by coupling the two simulations and exchanging information between them. The bridge allows us to simulate the hydrodynamics of the ejected atmosphere and its interaction with the planet's surface and the gravitational interaction between the planet, the moon, and the ejected atmosphere. To get the bridge to work, we will have to define the following:
 
@@ -140,4 +156,33 @@ Applying the aforementioned steps to our simulation, we get the following:
 
 2. **The coupling parameters**: The coupling parameters are the parameters that define the coupling between the hydrodynamics and gravitational interaction. These parameters include the coupling time, the coupling radius, etc. These parameters are less trivial and some thought needs to go into these parameters to ensure the coupling is done correctly and for the code to even run.
 
-<!-- Say something about how we chose these coupling parameters> 
+<!-- Say something about how we chose these coupling parameters>  -->
+
+## 1.8. Implementing the Simulation
+
+### 1.8.1. Simulating the MESA model
+<!--Insert mesa model making-->
+
+### 1.8.2. Importing the MESA model into AMUSE
+<!--Insert mesa model importing-->
+
+### 1.8.3. Making the Moon and the Planet
+<!--Insert moon and planet making-->
+
+### 1.8.4. Setting up the Hydrodynamics
+<!--Insert hydrodynamics setup-->
+
+### 1.8.5. Setting up the Gravity
+<!--Insert gravity setup-->
+
+### 1.8.6. Coupling the Hydrodynamics and Gravity
+<!--Insert coupling setup-->
+
+### 1.8.7. Running the Simulation
+<!--Insert simulation running-->
+
+## 1.9. Exploring different scenarios
+<!--Insert different scenarios-->
+
+## 1.10. Results
+<!--Insert results-->
