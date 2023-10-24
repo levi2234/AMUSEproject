@@ -6,7 +6,7 @@ This repository contains the code and documentation for an astronomical simulati
 ## 1.1. Project Team
 - Levi van Es - s2115409  
 - Andres Presa - s3643751
-- Esther
+- Esther van Dijk - s2034174
 
 ## 1.2. Table of Contents
 - [1. Astronomical Simulation Project](#1-astronomical-simulation-project)
