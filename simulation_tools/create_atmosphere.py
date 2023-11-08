@@ -1,8 +1,5 @@
 
 import numpy as np
-import amuse.units as u
-#open the csv file
-import csv
 from amuse.datamodel import Particles
 
 
