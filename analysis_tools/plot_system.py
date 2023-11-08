@@ -25,25 +25,8 @@ class systemplotter:
         Whether or not to display a grid.
     """
 
-    def __init__(self,system, xaxis = "x", yaxis = "y", xlabel=None, ylabel=None, legend=False, grid=False):
-        self.system = system
-        self.xaxis = xaxis
-        self.yaxis = yaxis
-        
-        if xlabel == None:
-            xlabel = xaxis
-        else: 
-            xlabel = xlabel
-            
-        if ylabel == None:
-            ylabel = yaxis
-            
-        else: 
-            ylabel = ylabel
 
-        self.legend = legend
-
-    def dynamic_accessor(self, obj, attribute_name):
+        def dynamic_accessor(self, obj, attribute_name):
             """
             Returns the value of the specified attribute of the given object, if it exists.
 
@@ -81,3 +64,24 @@ class systemplotter:
         plt.xlabel(self.xlabel)
         plt.ylabel(self.ylabel)
         plt.show()
+        
+    def __init__(self,system, xaxis = "x", yaxis = "y", xlabel=None, ylabel=None, legend=False, grid=False): #init is placed last so we can call the plot function in init
+        self.system = system
+        self.xaxis = xaxis
+        self.yaxis = yaxis
+        
+        if xlabel == None:
+            xlabel = xaxis
+        else: 
+            xlabel = xlabel
+            
+        if ylabel == None:
+            ylabel = yaxis
+            
+        else: 
+            ylabel = ylabel
+
+        self.legend = legend
+        
+        self.plot()
+
