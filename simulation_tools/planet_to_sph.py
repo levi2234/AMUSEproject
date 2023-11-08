@@ -4,6 +4,8 @@ import pickle
 
 from collections import namedtuple
 
+from earth_profile.read_PREM import CSVReader
+
 from amuse.community.gadget2.interface import Gadget2
 from amuse.ext.spherical_model import EnclosedMassInterpolator
 from amuse.ext.spherical_model import new_spherical_particle_distribution
@@ -83,10 +85,8 @@ class PlanetaryModel2SPH(object):
         self.radius       = self.particle.radius
 
     def load_planetary_structure(self):
-        if os.path.isfile(self.csv_file):
-            structure = np.genfromtxt(self.csv_file, delimiter=',', names=True)
-        else:
-            raise AmuseException("Input csv file '{0}' does not exist".format(self.csv_file))
+        reader = CSVReader(self.csv_file)
+        structure = reader.get_data()
 
         self.mass   = structure['mass']
         self.radius = structure['radius']
@@ -97,7 +97,7 @@ class PlanetaryModel2SPH(object):
         self.radius_profile      = structure['radius_profile']
         # self.mu_profile          = structure['mu_profile']
         # self.composition_profile = structure['composition_profile']
-        self.specific_internal_energy_profile = structure['specific_internal_energy_profile']
+        self.specific_internal_energy_profile = structure['specific_internal_energy_profile'] # to do
         # self.midpoints_profile   = structure['midpoints_profile']
         radius_profile = [0] | units.m
         radius_profile.extend(self.radius_profile) # outer radius of each mesh zone

@@ -15,6 +15,7 @@ class CSVReader:
         self.filename = filename
         self.data_dict = {'radius_profile': [],'density_profile': [],
                           'radius':6371000|units.m, 'mass': 5.972e27 | units.g}
+        self.read_and_convert()
 
     def read_and_convert(self):
         """
