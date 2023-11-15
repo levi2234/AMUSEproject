@@ -53,7 +53,7 @@ class Animator:
 
         self.ax.scatter(x_positions, y_positions)
 
-    def plot_animation(self, show=False, save_path=None):
+    def make_animation(self, show=False, save_path=None):
         self.fig, self.ax = plt.subplots()
 
         self.ax.set_xlabel(self.xlabel)
