@@ -4,7 +4,7 @@ import pickle
 
 from collections import namedtuple
 
-from earth_profile.read_PREM import CSVReader
+from read_PREM import CSVReader
 
 from amuse.community.gadget2.interface import Gadget2
 from amuse.ext.spherical_model import EnclosedMassInterpolator
