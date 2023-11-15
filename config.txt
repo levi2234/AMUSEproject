@@ -1,7 +1,0 @@
-[Planet]
-
-
-[Moon]
-
-
-[System]
