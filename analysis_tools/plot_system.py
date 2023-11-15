@@ -71,7 +71,7 @@ class systemplotter:
                 objectlabel = self.dynamic_accessor(systemobject, "name")
             except: 
                 objectlabel = None
-            plt.scatter(xaxisval,yaxisval,label = objectlabel,**kwargs)
+            plt.scatter(xaxisval, yaxisval, label = objectlabel, **kwargs)
             
         if self.legend:
             plt.legend()
