@@ -1,4 +1,4 @@
-from plot_system import systemplotter
+from analysis_tools.plot_system import systemplotter
 
 from matplotlib.animation import FuncAnimation
 import matplotlib.pyplot as plt

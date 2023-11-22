@@ -4,7 +4,7 @@ import pickle
 
 from collections import namedtuple
 
-from read_PREM import CSVReader
+# from read_PREM import CSVReader
 from earth_profile.atmosphere_profile import get_profile
 
 from amuse.community.gadget2.interface import Gadget2
@@ -102,7 +102,7 @@ class PlanetaryModel2SPH(object):
         # self.composition_profile = structure['composition_profile']
         self.temperature_profile = structure['temperature']
         self.mu_profile = structure['mmw']
-        self.specific_internal_energy_profile = (1.5 * constants.kB * self.temperature_profile / self.mu_profile).as_quantity_in(units.m**2/units.s**2)
+        self.specific_internal_energy_profile = (1.5 * constants.kB * self.temperature_profile / self.mu_profile * (1 | units.mol)).as_quantity_in(units.m**2/units.s**2)
         # self.specific_internal_energy_profile = structure['specific_internal_energy_profile'] # to do
         # self.midpoints_profile   = structure['midpoints_profile']
         radius_profile = [0] | units.m
