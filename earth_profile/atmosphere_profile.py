@@ -40,12 +40,14 @@ def get_profile():
 
         Returns:
             Dictionary with the following keys:
-            - 'radius': radial profile of atmosphere in units of km
+            - 'radius': total radius of the planet in km
+            - 'mass': total mass of the planet in kg
+            - 'radius_profile': radial profile of atmosphere in units of km
             - 'density': density profile of atmosphere in units of kg*m**-3
             - 'temperature': temperature profile of atmosphere in units of K
             - 'mmw': mean molecular weight in units of gmol-1
     '''
-    radius=[]
+    radius_profile=[]
     temp=[]
     density=[]
     mmw=[]
@@ -56,11 +58,11 @@ def get_profile():
             temp_in_K = float(row[1])
             density_inkm3 = float(row[2])
             mmw_in_gmol = float(row[3])
-            radius.append(radius_in_km*1000)
+            radius_profile.append(radius_in_km*1000)
             temp.append(temp_in_K)
             density.append(density_inkm3)
             mmw.append(mmw_in_gmol)
         
-    profile={'radius':np.array(radius)|units.km,'density':np.array(density)|units.kg * units.m**(-3),
-                'temperature':temp|units.K, 'mmw':mmw|units.g * units.mol}
+    profile={'radius_profile':np.array(radius_profile)|units.km,'density':np.array(density)|units.kg * units.m**(-3),
+                'temperature':temp|units.K, 'mmw':mmw|units.g * units.mol,'radius':6456|units.km, 'mass': 5.972e24 | units.kg}
     return profile
