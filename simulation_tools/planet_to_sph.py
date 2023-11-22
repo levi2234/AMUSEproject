@@ -5,6 +5,7 @@ import pickle
 from collections import namedtuple
 
 from read_PREM import CSVReader
+from earth_profile.atmosphere_profile import get_profile
 
 from amuse.community.gadget2.interface import Gadget2
 from amuse.ext.spherical_model import EnclosedMassInterpolator
@@ -85,19 +86,24 @@ class PlanetaryModel2SPH(object):
         self.radius       = self.particle.radius
 
     def load_planetary_structure(self):
-        reader = CSVReader(self.csv_file)
-        structure = reader.get_data()
+        # reader = CSVReader(self.csv_file)
+        # structure = reader.get_data()
+
+        structure = get_profile()
 
         self.mass   = structure['mass']
         self.radius = structure['radius']
         # self.number_of_zones     = structure['number_of_zones']
         # self.number_of_species   = structure['number_of_species']
         # self.species_names       = structure['species_names']
-        self.density_profile     = structure['density_profile']
+        self.density_profile     = structure['density']
         self.radius_profile      = structure['radius_profile']
         # self.mu_profile          = structure['mu_profile']
         # self.composition_profile = structure['composition_profile']
-        self.specific_internal_energy_profile = structure['specific_internal_energy_profile'] # to do
+        self.temperature_profile = structure['temperature']
+        self.mu_profile = structure['mmw']
+        self.specific_internal_energy_profile = (1.5 * constants.kB * self.temperature_profile / self.mu_profile).as_quantity_in(units.m**2/units.s**2)
+        # self.specific_internal_energy_profile = structure['specific_internal_energy_profile'] # to do
         # self.midpoints_profile   = structure['midpoints_profile']
         radius_profile = [0] | units.m
         radius_profile.extend(self.radius_profile) # outer radius of each mesh zone
