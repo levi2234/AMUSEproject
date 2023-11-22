@@ -7,6 +7,8 @@ from analysis_tools.animation import Animator
 
 from amuse.community.fi.interface import Fi
 from amuse.lab import nbody_system
+from amuse.units import units
+from amuse.io import write_set_to_file
 
 import pickle
 
@@ -49,16 +51,12 @@ index = 0
 while (hydro_code.model_time < 1 | units.day):
     hydro_code.evolve_model(1 | units.hour)
 
-    # save the x and y positions for plotting
-    x, y = hydro_code.gas_particles.x, hydro_code.gas_particles.y
-    x.append(hydro_code.dm_particles.x)
-    y.append(hydro_code.dm_particles.y)
-    
-    with open(path+f'x_positions_{index}', 'w') as file:
-        pickle.dump(x, file)
-
-    with open(path+f'y_positions_{index}', 'w') as file:
-        pickle.dump(y, file)
+    # save the gas and dm particles for plotting
+    # x, y = hydro_code.gas_particles.x, hydro_code.gas_particles.y
+    # x.append(hydro_code.dm_particles.x)
+    # y.append(hydro_code.dm_particles.y)
+    write_set_to_file(hydro_code.gas_particles, f'gas_particles_{index}.hdf5')
+    write_set_to_file(hydro_code.dm_particles, f'dm_particles_{index}.hdf5')
 
     index += 1
 

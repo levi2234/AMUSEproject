@@ -3,6 +3,8 @@ from plot_system import systemplotter
 from matplotlib.animation import FuncAnimation
 import matplotlib.pyplot as plt
 
+from amuse.io import read_set_from_file
+
 import numpy as np
 
 import pickle
@@ -43,13 +45,14 @@ class Animator:
         return counter
     
     def animate(self, i):
-        filename_x = self.data_path + f'x_positions_{i}'
-        with open(filename_x, 'r') as f:
-            x_positions = pickle.load(f)
+        filename_gas = self.data_path + f'gas_particles_{i}.hdf5'
+        filename_dm = self.data_path = f'dm_particles_{i}.hdf5'
+        
+        gas_particles = read_set_from_file(filename_gas)
+        dm_particles = read_set_from_file(filename_dm)
 
-        filename_y = self.data_path + f'y_positions_{i}'
-        with open(filename_y, 'r') as f:
-            y_positions = pickle.load(f)
+        x_positions = gas_particles.x.append(dm_particles.x)
+        y_positions = gas_particles.y.append(dm_particles.y)
 
         self.ax.scatter(x_positions, y_positions)
 
