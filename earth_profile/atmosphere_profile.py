@@ -64,5 +64,5 @@ def get_profile():
             mmw.append(mmw_in_gmol)
         
     profile={'radius_profile':np.array(radius_profile)|units.km,'density':np.array(density)|units.kg * units.m**(-3),
-                'temperature':temp|units.K, 'mmw':mmw|units.g * units.mol,'radius':6456|units.km, 'mass': 5.972e24 | units.kg}
+                'temperature':temp|units.K, 'mmw':mmw|units.g * units.mol**(-1),'radius':6456|units.km, 'mass': 5.972e24 | units.kg}
     return profile
