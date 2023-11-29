@@ -102,7 +102,7 @@ class PlanetaryModel2SPH(object):
         # self.composition_profile = structure['composition_profile']
         self.temperature_profile = structure['temperature']
         self.mu_profile = structure['mmw']
-        self.specific_internal_energy_profile = (1.5 * constants.kB * self.temperature_profile / self.mu_profile * (1 | units.mol)).as_quantity_in(units.m**2/units.s**2)
+        self.specific_internal_energy_profile = (1.5 * constants.kB * self.temperature_profile / self.mu_profile / (1 | units.mol)).as_quantity_in(units.m**2/units.s**2)
         # self.specific_internal_energy_profile = structure['specific_internal_energy_profile'] # to do
         # self.midpoints_profile   = structure['midpoints_profile']
         radius_profile = [0] | units.m
@@ -129,6 +129,8 @@ class PlanetaryModel2SPH(object):
         min_i = i_edge
         max_i = len(self.radius_profile)-3
         enclosed_mass_edge = interpolator.enclosed_mass[min_i+1]
+        print('earth mass = ', (1 | units.MEarth).in_(units.kg))
+        print('enclosed mass edge:', enclosed_mass_edge)
         min_enclosed_mass_residual = self.construct_model_with_core(min_i, enclosed_mass_edge, self.gamma)
         enclosed_mass_edge = interpolator.enclosed_mass[max_i+1]
         max_enclosed_mass_residual = self.construct_model_with_core(max_i, enclosed_mass_edge, self.gamma)
@@ -136,7 +138,7 @@ class PlanetaryModel2SPH(object):
             max_i -= 20
             enclosed_mass_edge = interpolator.enclosed_mass[max_i+1]
             max_enclosed_mass_residual = self.construct_model_with_core(max_i, enclosed_mass_edge, self.gamma)
-
+        print(min_enclosed_mass_residual)
         if (min_enclosed_mass_residual > zero) or (max_enclosed_mass_residual < zero):
             raise AmuseException("Requested target_core_mass of {0} is out of range.".format(self.target_core_mass))
 
@@ -164,6 +166,7 @@ class PlanetaryModel2SPH(object):
         u = self.specific_internal_energy_profile * 1
         m_enc = m_enc_edge
         r_c = r[i_edge]
+        print(r_c)
         entropy = self.original_entropy * 1
 #~            entropy[:i_edge+1] = (entropy[:i_edge+1] + entropy[i_edge+1]) / 2.0
         entropy[:i_edge+1] = entropy[i_edge+1]
@@ -199,6 +202,7 @@ class PlanetaryModel2SPH(object):
 
         self.rho = rho
         self.u = u
+        print(m_enc)
         return m_enc
 
 

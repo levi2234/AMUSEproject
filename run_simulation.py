@@ -14,7 +14,7 @@ import pickle
 
 # create planet
 number_of_sph_particles = 100
-target_core_mass = 0.9 | units.MEarth
+target_core_mass = 0.01 | units.MEarth
 csv_file = 'earth_profile/PREM.csv' # file with earth profiles
 
 # for now create the model with planet_to_sph,

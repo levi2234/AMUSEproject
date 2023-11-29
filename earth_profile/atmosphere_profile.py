@@ -24,7 +24,7 @@ def get_atmospheric_profile(n_points=50):
                   0.0000742,0.0000349,0.0000157,0.00000677])#| units.kg * units.m**(-3)
     
     new_altitude = np.linspace(0, 85, n_points)+6371
-    mean_molecular_weight=28.96*np.ones(len(new_altitude))|units.g * (units.mol)**(-1)
+    mean_molecular_weight=28.96*np.ones(len(new_altitude))| (units.g * units.mol**(-1))
     new_temp=np.interp(new_altitude,altitude,temperature)|units.K
     new_density=np.interp(new_altitude,altitude,density)|units.kg * units.m**(-3)
 
