@@ -58,9 +58,11 @@ class Animator:
 
         filename_gas = self.data_path + f'gas_particles_{i}.hdf5'
         filename_dm = self.data_path + f'dm_particles_{i}.hdf5'
+        filename_gravity = self.data_path + f'gravity_particles_{i}.hdf5'
         
         gas_particles = read_set_from_file(filename_gas)
         dm_particles = read_set_from_file(filename_dm)
+        gravity_particles = read_set_from_file(filename_gravity)
 
         x_positions = gas_particles.x.value_in(units.AU)#.append(dm_particles.x)
         y_positions = gas_particles.y.value_in(units.AU)#.append(dm_particles.y)
@@ -70,8 +72,10 @@ class Animator:
         
         # print(len(x_positions), len(y_positions))
 
-        self.ax.scatter(x_positions, y_positions, color='red')
-
+        self.ax.scatter(x_positions, y_positions, color='red', label='planet')
+        self.ax.scatter(gravity_particles.x.value_in(units.AU), gravity_particles.y.value_in(units.AU), color='blue', label='moon')
+        self.ax.legend()
+        
     def make_animation(self, show=False, save_path=None):
         self.fig, self.ax = plt.subplots()
 
@@ -85,7 +89,8 @@ class Animator:
         frames = np.arange(0, int(self.n_frames/2)-1)
 
         animation = FuncAnimation(self.fig, self.animate, frames)
-
+        
+        
         if show:
             self.fig.show()
 
