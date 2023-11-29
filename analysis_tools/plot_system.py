@@ -45,7 +45,7 @@ class systemplotter:
             raise AttributeError(f"'{type(obj).__name__}' object has no attribute '{attribute_name}'")
     
         
-    def plot(self, save=True,**kwargs):
+    def plot(self, save=True,c="blue", close=True,**kwargs):
         for systemobject in self.system: 
             xaxisval = self.dynamic_accessor(systemobject, self.xaxis).value_in(units.km)
             yaxisval = self.dynamic_accessor(systemobject, self.yaxis).value_in(units.km)
@@ -54,20 +54,25 @@ class systemplotter:
                 objectlabel = self.dynamic_accessor(systemobject, "name")
             except: 
                 objectlabel = None
-            plt.scatter(xaxisval,yaxisval,label = objectlabel,**kwargs)
+            plt.scatter(xaxisval,yaxisval,label = objectlabel,c=c,**kwargs)
+            
+        if close==False:
+            return  
             
         if self.legend:
             plt.legend()
         if self.grid:
             plt.grid()
-            
+        
+ 
         plt.xlabel(self.xlabel)
         plt.ylabel(self.ylabel)
-        if (save == True) & isinstance(save, str):
+        if isinstance(save, str):
             plt.savefig(save)
         
-        if save == True:
-            plt.savefig("plot.png")
+
+            
+        
         
         plt.show()
         
