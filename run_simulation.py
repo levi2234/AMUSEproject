@@ -46,6 +46,7 @@ plt.savefig('simulation_results/planetbefore.png')
 
 #----------------------PHYSICS SETUP----------------------
 
+# add the hydroparticles to a hydrocode and run for some time to check if it's stable
 
 converter = nbody_system.nbody_to_si(10|units.MSun, core_radius)
 
@@ -103,9 +104,7 @@ hydro_code.stop()
 systemplotter(hydro_code.gas_particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="b",s=2, close=False)
 systemplotter(hydro_code.dm_particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="r",s=20)
 # make an animation of the system over time
-
-
-
-# animator = Animator(path, xlabel='x', ylabel='y')
-# animator.make_animation(save_path='simulation_results/animation.mp4')
+hydro_code.stop()
+animator = Animator(path, xlabel='x', ylabel='y')
+animator.make_animation(save_path='simulation_results/animation.mp4')
 

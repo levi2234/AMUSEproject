@@ -20,7 +20,7 @@ def setup_stellar_evolution_model():
 
     stellar_evolution = MESA(redirection="none")
     stars = Particles(1)
-    stars.mass = 15.0 | units.MSun
+    stars.mass = 1.0 | units.MJupiter
     stellar_evolution.particles.add_particles(stars)
     stellar_evolution.commit_particles()
 
