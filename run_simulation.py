@@ -6,11 +6,13 @@ import matplotlib.pyplot as plt
 from simulation_tools import inject_energy
 
 from amuse.ext.star_to_sph import (pickle_stellar_model, convert_stellar_model_to_SPH,)
+from amuse.ext.orbital_elements import new_binary_from_orbital_elements
 from amuse.community.fi.interface import Fi
 from amuse.community.bhtree.interface import BHTree
 from amuse.couple.bridge import Bridge
 from amuse.lab import nbody_system
 from amuse.units import units
+from amuse.units import constants
 from amuse.io import write_set_to_file
 from amuse.datamodel import Particles
 
@@ -39,6 +41,22 @@ core, gas_without_core, core_radius = \
         model.core_particle, model.gas_particles, model.core_radius
 
 
+#---------------------Create a Moon --------------------
+#calcualte the planets total mass
+planet_mass = core.mass.sum() + gas_without_core.mass.sum()
+moon_mass = 0.012*planet_mass
+
+#create binary system with the planet and the moon from orbital elements
+system = new_binary_from_orbital_elements(planet_mass,moon_mass,5.2 | units.AU, 0, G = constants.G)
+#move most massive object to 0,0,0
+system.position = system.position -system[0].position
+
+#add moon to own particle set (could be done better but this only works for 2 objects)
+moon = Particles(1)
+moon.mass = moon_mass
+moon.position = system[1].position
+moon.velocity = system[1].velocity
+
 #----------------------BEFORE PLOT-----------------------
 plt.scatter(gas_without_core.x.value_in(units.AU), gas_without_core.y.value_in(units.AU),c="blue", marker='o')
 plt.scatter(core.x.value_in(units.AU), core.y.value_in(units.AU),c="r", marker='o')
@@ -60,7 +78,7 @@ hydro_code.dm_particles.add_particle(core)
 #setup gravity code
 gravity_code = BHTree(converter)
 gravity_code.parameters.epsilon_squared = core_radius**2
-gravity_code.particles.add_particles(hydro_code.particles)
+gravity_code.particles.add_particles(moon)
 
 #setup the bridge
 # Create the bridge
@@ -75,36 +93,38 @@ bridge.timestep = 1 | units.hour
 
 path = 'simulation_results/test_planet/'
 index = 0
-triggered = False
+triggered_injection = False
 
 
 #----------------------RUN THE SIMULATION----------------------
 while (hydro_code.model_time < 1 | units.day):
-    hydro_code.evolve_model(hydro_code.model_time + bridge.timestep)
-    
-    # save the gas and dm particles for plotting
-    # x, y = hydro_code.gas_particles.x, hydro_code.gas_particles.y
-    # x.append(hydro_code.dm_particles.x)
-    # y.append(hydro_code.dm_particles.y)
-    if (hydro_code.model_time.value_in(units.hour) >= 6) & (triggered == False): #do something at the 6th timestep( 6 hours in)   
+    #hydro_code.evolve_model(hydro_code.model_time + bridge.timestep)
+    bridge.evolve_model(hydro_code.model_time + bridge.timestep)
+
+    if (hydro_code.model_time.value_in(units.hour) >= 6) & (triggered_injection == False): #do something at the 6th timestep( 6 hours in)   
         #inject energy
-        triggered = True
+        triggered_injection = True
         print("injecting energy")
-        inject_energy.inject_explosion_energy(hydro_code.gas_particles,explosion_energy=1.0e+51|units.erg,exploding_region=10|units.RSun)
+        #inject_energy.inject_explosion_energy(hydro_code.gas_particles,explosion_energy=1.0e+51|units.erg,exploding_region=10|units.RSun)
         
     
     write_set_to_file(hydro_code.gas_particles, path+f'gas_particles_{index}.hdf5', overwrite_file=True)
     write_set_to_file(hydro_code.dm_particles, path+f'dm_particles_{index}.hdf5', overwrite_file=True)
+    write_set_to_file(gravity_code.particles, path+f'gravity_particles_{index}.hdf5', overwrite_file=True)
 
     index += 1
-hydro_code.stop()
+
 
 
 #----------------------AFTER PLOT-----------------------
 systemplotter(hydro_code.gas_particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="b",s=2, close=False)
+systemplotter(gravity_code.particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="r",s=40, close=False)
 systemplotter(hydro_code.dm_particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="r",s=20)
-# make an animation of the system over time
+
 hydro_code.stop()
+gravity_code.stop()
 animator = Animator(path, xlabel='x', ylabel='y')
 animator.make_animation(save_path='simulation_results/animation.mp4')
+
+
 
