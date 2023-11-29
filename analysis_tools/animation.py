@@ -46,7 +46,9 @@ class Animator:
     
     def animate(self, i):
         filename_gas = self.data_path + f'gas_particles_{i}.hdf5'
-        filename_dm = self.data_path = f'dm_particles_{i}.hdf5'
+        filename_dm = self.data_path + f'dm_particles_{i}.hdf5'
+        
+        print(filename_gas)
         
         gas_particles = read_set_from_file(filename_gas)
         dm_particles = read_set_from_file(filename_dm)
@@ -62,7 +64,7 @@ class Animator:
         self.ax.set_xlabel(self.xlabel)
         self.ax.set_ylabel(self.ylabel)
 
-        frames = np.arange(0, self.n_frames)
+        frames = np.arange(0, int(self.n_frames/2))
 
         animation = FuncAnimation(self.fig, self.animate, frames)
 
