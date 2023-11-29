@@ -26,25 +26,25 @@ class systemplotter:
     """
 
 
-        def dynamic_accessor(self, obj, attribute_name):
-            """
-            Returns the value of the specified attribute of the given object, if it exists.
+    def dynamic_accessor(self, obj, attribute_name):
+        """
+        Returns the value of the specified attribute of the given object, if it exists.
 
-            Args:
-                obj: The object to retrieve the attribute from.
-                attribute_name: The name of the attribute to retrieve.
+        Args:
+            obj: The object to retrieve the attribute from.
+            attribute_name: The name of the attribute to retrieve.
 
-            Returns:
-                The value of the specified attribute.
+        Returns:
+            The value of the specified attribute.
 
-            Raises:
-                AttributeError: If the specified attribute does not exist on the object.
-            """
-            if hasattr(obj, attribute_name):
-                return getattr(obj, attribute_name)
-            else:
-                raise AttributeError(f"'{type(obj).__name__}' object has no attribute '{attribute_name}'")
-    
+        Raises:
+            AttributeError: If the specified attribute does not exist on the object.
+        """
+        if hasattr(obj, attribute_name):
+            return getattr(obj, attribute_name)
+        else:
+            raise AttributeError(f"'{type(obj).__name__}' object has no attribute '{attribute_name}'")
+
         
     def plot(self,**kwargs):
         for systemobject in self.system: 
