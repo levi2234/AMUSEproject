@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
-import amuse.units as u
-import amuse.units as units
+
 #function for plotting an amuse particle system
 
 class systemplotter:
@@ -44,12 +43,13 @@ class systemplotter:
             return getattr(obj, attribute_name)
         else:
             raise AttributeError(f"'{type(obj).__name__}' object has no attribute '{attribute_name}'")
-
+    
         
-    def plot(self,**kwargs):
+    def plot(self, save=True,**kwargs):
         for systemobject in self.system: 
-            xaxisval = self.dynamic_accessor(systemobject, self.xaxis).value_in(units.AU)
-            yaxisval = self.dynamic_accessor(systemobject, self.yaxis).value_in(units.AU)
+            xaxisval = self.dynamic_accessor(systemobject, self.xaxis).value_in(units.km)
+            yaxisval = self.dynamic_accessor(systemobject, self.yaxis).value_in(units.km)
+            
             try: 
                 objectlabel = self.dynamic_accessor(systemobject, "name")
             except: 
@@ -63,25 +63,35 @@ class systemplotter:
             
         plt.xlabel(self.xlabel)
         plt.ylabel(self.ylabel)
+        if (save == True) & isinstance(save, str):
+            plt.savefig(save)
+        
+        if save == True:
+            plt.savefig("plot.png")
+        
         plt.show()
+        
         
     def __init__(self,system, xaxis = "x", yaxis = "y", xlabel=None, ylabel=None, legend=False, grid=False): #init is placed last so we can call the plot function in init
         self.system = system
         self.xaxis = xaxis
         self.yaxis = yaxis
+
+        
         
         if xlabel == None:
-            xlabel = xaxis
+            self.xlabel = xaxis
         else: 
-            xlabel = xlabel
+            self.xlabel = xlabel
             
         if ylabel == None:
-            ylabel = yaxis
+            self.ylabel = yaxis
             
         else: 
-            ylabel = ylabel
+            self.ylabel = ylabel
 
         self.legend = legend
-        
+        self.grid = grid
+ 
         self.plot()
 
