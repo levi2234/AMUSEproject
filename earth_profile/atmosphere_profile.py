@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from amuse.units import units
+from amuse.units import units,constants
 import csv
 
 def get_atmospheric_profile(n_points=50):
@@ -50,19 +50,33 @@ def get_profile():
     radius_profile=[]
     temp=[]
     density=[]
+    density_atm=[]
     mmw=[]
     with open('profile_earth.csv') as file:
         reader = csv.reader(file)
         for row in reader:
             radius_in_km = float(row[0])
             temp_in_K = float(row[1])
-            density_inkm3 = float(row[2])
+            density_in_kgm3=float(row[2])
             mmw_in_gmol = float(row[3])
             radius_profile.append(radius_in_km*1000)
             temp.append(temp_in_K)
-            density.append(density_inkm3)
             mmw.append(mmw_in_gmol)
-        
-    profile={'radius_profile':np.array(radius_profile)|units.km,'density':np.array(density)|units.kg * units.m**(-3),
+            density_atm.append(density_in_kgm3)
+    with open('PREM.csv') as prem:
+        read_prem=csv.reader(prem)
+        next(read_prem)
+        next(read_prem)
+        r_prem=[]
+        for row in read_prem:
+            if row:
+                density_in_gcm3 = float(row[2])
+                radius_prem=float(row[0])
+                density.append(density_in_gcm3*1000)
+                r_prem.append(radius_prem)
+    new_density=list(np.interp(radius_profile[:41],r_prem,density))
+    new_density=new_density+(density_atm[41:])
+    profile={'radius_profile':np.array(radius_profile)|units.km,'density':np.array(new_density)|units.kg * units.m**(-3),
                 'temperature':temp|units.K, 'mmw':mmw|units.g * units.mol**(-1),'radius':6456|units.km, 'mass': 5.972e24 | units.kg}
-    return profile
+    return r_prem,density,radius_profile
+
