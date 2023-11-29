@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from amuse.units import units
 
 #function for plotting an amuse particle system
 
