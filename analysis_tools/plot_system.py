@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
-import amuse.units as u
-import amuse.units as units
+from amuse.units import units  
 #function for plotting an amuse particle system
 
 class systemplotter:
@@ -26,62 +25,75 @@ class systemplotter:
     """
 
 
-        def dynamic_accessor(self, obj, attribute_name):
-            """
-            Returns the value of the specified attribute of the given object, if it exists.
+    def dynamic_accessor(self, obj, attribute_name):
+        """
+        Returns the value of the specified attribute of the given object, if it exists.
 
-            Args:
-                obj: The object to retrieve the attribute from.
-                attribute_name: The name of the attribute to retrieve.
+        Args:
+            obj: The object to retrieve the attribute from.
+            attribute_name: The name of the attribute to retrieve.
 
-            Returns:
-                The value of the specified attribute.
+        Returns:
+            The value of the specified attribute.
 
-            Raises:
-                AttributeError: If the specified attribute does not exist on the object.
-            """
-            if hasattr(obj, attribute_name):
-                return getattr(obj, attribute_name)
-            else:
-                raise AttributeError(f"'{type(obj).__name__}' object has no attribute '{attribute_name}'")
+        Raises:
+            AttributeError: If the specified attribute does not exist on the object.
+        """
+        if hasattr(obj, attribute_name):
+            return getattr(obj, attribute_name)
+        else:
+            raise AttributeError(f"'{type(obj).__name__}' object has no attribute '{attribute_name}'")
     
         
-    def plot(self,**kwargs):
+
+    def plot(self, savefig=False, **kwargs):
+        fig, ax = plt.subplots()
+
         for systemobject in self.system: 
-            xaxisval = self.dynamic_accessor(systemobject, self.xaxis).value_in(units.AU)
-            yaxisval = self.dynamic_accessor(systemobject, self.yaxis).value_in(units.AU)
+            xaxisval = self.dynamic_accessor(systemobject, self.xaxis).value_in(units.m)
+            yaxisval = self.dynamic_accessor(systemobject, self.yaxis).value_in(units.m)
             try: 
                 objectlabel = self.dynamic_accessor(systemobject, "name")
             except: 
                 objectlabel = None
-            plt.scatter(xaxisval,yaxisval,label = objectlabel,**kwargs)
+                
+            if objectlabel == "planet":
+                radius = self.dynamic_accessor(systemobject, "radius").value_in(units.m)
+                circle = plt.Circle((0, 0), radius, color='green',alpha= 0.2, fill=True)
+                ax.add_artist(circle)
+            else: 
+                ax.scatter(xaxisval, yaxisval, label=objectlabel, **kwargs)
             
         if self.legend:
-            plt.legend()
+            ax.legend()
         if self.grid:
-            plt.grid()
+            ax.grid()
             
-        plt.xlabel(self.xlabel)
-        plt.ylabel(self.ylabel)
-        plt.show()
+        #ax.set_aspect('equal')
+        ax.set_xlabel(self.xlabel)
+        ax.set_ylabel(self.ylabel)
+        if savefig:
+            plt.savefig(savefig)
+        else:
+            plt.show()
         
-    def __init__(self,system, xaxis = "x", yaxis = "y", xlabel=None, ylabel=None, legend=False, grid=False): #init is placed last so we can call the plot function in init
+    def __init__(self, system, xaxis="x", yaxis="y", xlabel=None, ylabel=None, legend=False, grid=False, **kwargs):
         self.system = system
         self.xaxis = xaxis
         self.yaxis = yaxis
         
-        if xlabel == None:
-            xlabel = xaxis
+        
+        if xlabel is None:
+            self.xlabel = xaxis
         else: 
-            xlabel = xlabel
+            self.xlabel = xlabel
             
-        if ylabel == None:
-            ylabel = yaxis
-            
+        if ylabel is None:
+            self.ylabel = yaxis
         else: 
-            ylabel = ylabel
+            self.ylabel = ylabel
 
         self.legend = legend
+        self.grid = grid
         
         self.plot()
-
