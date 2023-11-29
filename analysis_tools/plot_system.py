@@ -56,7 +56,7 @@ class systemplotter:
             except: 
                 objectlabel = None
             plt.scatter(xaxisval,yaxisval,label = objectlabel,c=c,**kwargs)
-            
+            plt.axis('equal')
         if close==False:
             return  
             

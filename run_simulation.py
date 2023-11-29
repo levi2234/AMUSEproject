@@ -105,7 +105,7 @@ while (hydro_code.model_time < 1 | units.day):
         #inject energy
         triggered_injection = True
         print("injecting energy")
-        #inject_energy.inject_explosion_energy(hydro_code.gas_particles,explosion_energy=1.0e+51|units.erg,exploding_region=10|units.RSun)
+        inject_energy.inject_explosion_energy(hydro_code.gas_particles,explosion_energy=1.0e+25|units.erg,exploding_region=10|units.RSun)
         
     
     write_set_to_file(hydro_code.gas_particles, path+f'gas_particles_{index}.hdf5', overwrite_file=True)
