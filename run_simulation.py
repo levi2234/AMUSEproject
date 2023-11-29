@@ -20,7 +20,7 @@ from amuse.datamodel import Particles
 import pickle
 
 # ----------------------CREATE THE PLANET----------------------
-number_of_sph_particles = 1000
+number_of_sph_particles = 50000
 target_core_mass = 5 | units.MSun # is this a possible unit?
 pickle_file = 'profiles/super_giant_stellar_structure.pkl' # insert planet profile name from mesa
 
@@ -41,15 +41,19 @@ core, gas_without_core, core_radius = \
         model.core_particle, model.gas_particles, model.core_radius
 
 
-#---------------------Create a Moon --------------------
-#calcualte the planets total mass
+#---------------------CREATE MOON--------------------
+#System Parameters
 planet_mass = core.mass.sum() + gas_without_core.mass.sum()
 moon_mass = 0.012*planet_mass
+semimajor_axis = 5.2 | units.AU
+eccentricity = 0
 
-#create binary system with the planet and the moon from orbital elements
-system = new_binary_from_orbital_elements(planet_mass,moon_mass,5.2 | units.AU, 0, G = constants.G)
-#move most massive object to 0,0,0
-system.position = system.position -system[0].position
+#Create Binary
+system = new_binary_from_orbital_elements(planet_mass,moon_mass,semimajor_axis, eccentricity, G = constants.G)
+
+
+#Translate system to geocentric frame
+system.position = system.position - system[0].position
 
 #add moon to own particle set (could be done better but this only works for 2 objects)
 moon = Particles(1)
@@ -57,15 +61,11 @@ moon.mass = moon_mass
 moon.position = system[1].position
 moon.velocity = system[1].velocity
 
-#----------------------BEFORE PLOT-----------------------
-plt.scatter(gas_without_core.x.value_in(units.AU), gas_without_core.y.value_in(units.AU),c="blue", marker='o')
-plt.scatter(core.x.value_in(units.AU), core.y.value_in(units.AU),c="r", marker='o')
-plt.savefig('simulation_results/planetbefore.png')
+
 
 #----------------------PHYSICS SETUP----------------------
 
-# add the hydroparticles to a hydrocode and run for some time to check if it's stable
-
+#setup converter
 converter = nbody_system.nbody_to_si(10|units.MSun, core_radius)
 
 #setup hydro code
@@ -81,10 +81,9 @@ gravity_code.parameters.epsilon_squared = core_radius**2
 gravity_code.particles.add_particles(moon)
 
 #setup the bridge
-# Create the bridge
 bridge = Bridge(use_threading=False)
-bridge.add_system(gravity_code, (hydro_code,))
-bridge.add_system(hydro_code, (gravity_code,))
+bridge.add_system(gravity_code, (hydro_code,)) #makes sure planet/atmosphere particles are affected by gravity
+bridge.add_system(hydro_code, (gravity_code,)) #makes sure moon is also affected by hydrodynamics and stays in orbit
 
 # Set the timestep for the bridge
 bridge.timestep = 1 | units.hour
@@ -95,17 +94,22 @@ path = 'simulation_results/test_planet/'
 index = 0
 triggered_injection = False
 
+#----------------------BEFORE PLOT-----------------------
+systemplotter(hydro_code.gas_particles, xlabel='x', ylabel='y').plot(save="simulation_results/planetbefore.png", c="b",s=2, close=False)
+systemplotter(gravity_code.particles, xlabel='x', ylabel='y').plot(save="simulation_results/planetbefore.png", c="r",s=40, close=False)
+systemplotter(hydro_code.dm_particles, xlabel='x', ylabel='y').plot(save="simulation_results/testplanetBefore.png", c="r",s=20)
+
 
 #----------------------RUN THE SIMULATION----------------------
-while (hydro_code.model_time < 1 | units.day):
-    #hydro_code.evolve_model(hydro_code.model_time + bridge.timestep)
+while (hydro_code.model_time < 10 | units.day):
+    
     bridge.evolve_model(hydro_code.model_time + bridge.timestep)
 
-    if (hydro_code.model_time.value_in(units.hour) >= 6) & (triggered_injection == False): #do something at the 6th timestep( 6 hours in)   
+    if (hydro_code.model_time.value_in(units.hour) >= 9) & (triggered_injection == False): #do something at the 6th timestep( 6 hours in)   
         #inject energy
         triggered_injection = True
         print("injecting energy")
-        inject_energy.inject_explosion_energy(hydro_code.gas_particles,explosion_energy=1.0e+25|units.erg,exploding_region=10|units.RSun)
+        inject_energy.inject_explosion_energy(hydro_code.gas_particles,explosion_energy=2e50|units.erg,exploding_region=10|units.RSun)
         
     
     write_set_to_file(hydro_code.gas_particles, path+f'gas_particles_{index}.hdf5', overwrite_file=True)
@@ -117,14 +121,19 @@ while (hydro_code.model_time < 1 | units.day):
 
 
 #----------------------AFTER PLOT-----------------------
+#this code needs to run before the simulation is stopped
 systemplotter(hydro_code.gas_particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="b",s=2, close=False)
 systemplotter(gravity_code.particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="r",s=40, close=False)
-systemplotter(hydro_code.dm_particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="r",s=20)
+systemplotter(hydro_code.dm_particles, xlabel='x', ylabel='y').plot(save="simulation_results/testplanetAfter.png", c="r",s=20)
 
+
+#----------------------STOP THE SIMULATION-----------------------
 hydro_code.stop()
 gravity_code.stop()
-animator = Animator(path, xlabel='x', ylabel='y')
-animator.make_animation(save_path='simulation_results/animation.mp4')
+
+# #----------------------ANIMATION-----------------------
+# animator = Animator(path, xlabel='x', ylabel='y')
+# animator.make_animation(save_path='simulation_results/testplanetanim.mp4')
 
 
 
