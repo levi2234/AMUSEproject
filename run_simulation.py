@@ -1,8 +1,6 @@
-import numpy as np
-
 from analysis_tools.plot_system import systemplotter
 from analysis_tools.animation import Animator
-import matplotlib.pyplot as plt
+
 from simulation_tools import inject_energy
 
 from amuse.ext.star_to_sph import (pickle_stellar_model, convert_stellar_model_to_SPH,)
@@ -16,13 +14,15 @@ from amuse.units import constants
 from amuse.io import write_set_to_file
 from amuse.datamodel import Particles
 
-
+import os
 import pickle
+import matplotlib.pyplot as plt
+import numpy as np
 
 # ----------------------CREATE THE PLANET----------------------
 number_of_sph_particles = 1000
-target_core_mass = 5 | units.MSun # is this a possible unit?
-pickle_file = 'profiles/super_giant_stellar_structure.pkl' # insert planet profile name from mesa
+target_core_mass = 0.9 | units.MJupiter
+pickle_file = 'simulation_tools/profiles/jupiter_like_planet_structure.pkl' # insert planet profile name from mesa
 
 # for now create the model with planet_to_sph,
 # can only run after the profiles are complete in earth_profile/PREM.csv
@@ -41,13 +41,19 @@ core, gas_without_core, core_radius = \
         model.core_particle, model.gas_particles, model.core_radius
 
 
+
 #---------------------Create a Moon --------------------
 #calcualte the planets total mass
 planet_mass = core.mass.sum() + gas_without_core.mass.sum()
-moon_mass = 0.012*planet_mass
+moon_mass = 0.008 | units.MEarth # mass Europa, previously: 0.012*planet_mass
+moon_mass = 0.015 | units.Mearth # mass Io
 
 #create binary system with the planet and the moon from orbital elements
-system = new_binary_from_orbital_elements(planet_mass,moon_mass,5.2 | units.AU, 0, G = constants.G)
+distance_planet_moon = 671000 | units.km # distance Europa from jupiter
+distance_planet_moon = 421600 | units.km # distance Io and Jupiter
+eccentricity = 0 # 0.009 for Europa, 0.004 for Io, but close enough to 0.
+system = new_binary_from_orbital_elements(planet_mass, moon_mass, distance_planet_moon, eccentricity, G = constants.G)
+
 #move most massive object to 0,0,0
 system.position = system.position -system[0].position
 
@@ -56,11 +62,12 @@ moon = Particles(1)
 moon.mass = moon_mass
 moon.position = system[1].position
 moon.velocity = system[1].velocity
+print(moon.velocity.in_(units.kms))
 
 #----------------------BEFORE PLOT-----------------------
-plt.scatter(gas_without_core.x.value_in(units.AU), gas_without_core.y.value_in(units.AU),c="blue", marker='o')
-plt.scatter(core.x.value_in(units.AU), core.y.value_in(units.AU),c="r", marker='o')
-plt.savefig('simulation_results/planetbefore.png')
+# plt.scatter(gas_without_core.x.value_in(units.AU), gas_without_core.y.value_in(units.AU),c="blue", marker='o')
+# plt.scatter(core.x.value_in(units.AU), core.y.value_in(units.AU),c="r", marker='o')
+# plt.savefig('simulation_results/planetbefore.png')
 
 #----------------------PHYSICS SETUP----------------------
 
@@ -87,25 +94,35 @@ bridge.add_system(gravity_code, (hydro_code,))
 bridge.add_system(hydro_code, (gravity_code,))
 
 # Set the timestep for the bridge
-bridge.timestep = 1 | units.hour
+bridge.timestep = 4 | units.hour
 
 
 
-path = 'simulation_results/test_planet/'
+path = 'simulation_results/jupiterlike_planet/'
+if not os.path.exists(path):
+    os.mkdir(path)
+
 index = 0
 triggered_injection = False
 
 
 #----------------------RUN THE SIMULATION----------------------
-while (hydro_code.model_time < 1 | units.day):
+while (hydro_code.model_time < 3 | units.day):
     #hydro_code.evolve_model(hydro_code.model_time + bridge.timestep)
     bridge.evolve_model(hydro_code.model_time + bridge.timestep)
 
-    if (hydro_code.model_time.value_in(units.hour) >= 6) & (triggered_injection == False): #do something at the 6th timestep( 6 hours in)   
+    if (hydro_code.model_time.value_in(units.hour) >= 24) & (triggered_injection == False): #do something at the 6th timestep( 6 hours in)   
         #inject energy
         triggered_injection = True
         print("injecting energy")
-        inject_energy.inject_explosion_energy(hydro_code.gas_particles,explosion_energy=1.0e+25|units.erg,exploding_region=10|units.RSun)
+        planet_radius = max([np.sqrt(pos.length_squared()) for pos in gas_without_core.position])
+        
+        outer_fraction = 0.3
+        explosion_radius = planet_radius - (planet_radius * outer_fraction)
+        print(explosion_radius.in_(units.RJupiter))
+        explosion_energy = 9.0e+47|units.erg
+
+        inject_energy.inject_explosion_energy(hydro_code.gas_particles,explosion_energy=explosion_energy, exploding_region=explosion_radius)
         
     
     write_set_to_file(hydro_code.gas_particles, path+f'gas_particles_{index}.hdf5', overwrite_file=True)
@@ -117,14 +134,17 @@ while (hydro_code.model_time < 1 | units.day):
 
 
 #----------------------AFTER PLOT-----------------------
-systemplotter(hydro_code.gas_particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="b",s=2, close=False)
-systemplotter(gravity_code.particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="r",s=40, close=False)
-systemplotter(hydro_code.dm_particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="r",s=20)
+# systemplotter(hydro_code.gas_particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="b",s=2, close=False)
+# systemplotter(gravity_code.particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="r",s=40, close=False)
+# systemplotter(hydro_code.dm_particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="r",s=20)
 
 hydro_code.stop()
 gravity_code.stop()
-animator = Animator(path, xlabel='x', ylabel='y')
-animator.make_animation(save_path='simulation_results/animation.mp4')
+
+
+path = 'simulation_results/jupiterlike_planet/'
+animator = Animator(path, xlabel='x', ylabel='y', xlim=0.02, ylim=0.02)
+animator.make_animation(save_path='simulation_results/animation_jup.mp4')
 
 
 
