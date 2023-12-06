@@ -20,7 +20,7 @@ from amuse.datamodel import Particles
 import pickle
 
 # ----------------------CREATE THE PLANET----------------------
-number_of_sph_particles = 1000
+number_of_sph_particles = 1500
 target_core_mass = 5 | units.MSun # is this a possible unit?
 pickle_file = 'profiles/super_giant_stellar_structure.pkl' # insert planet profile name from mesa
 
@@ -47,7 +47,7 @@ planet_mass = core.mass.sum() + gas_without_core.mass.sum()
 moon_mass = 0.012*planet_mass
 
 #create binary system with the planet and the moon from orbital elements
-system = new_binary_from_orbital_elements(planet_mass,moon_mass,5.2 | units.AU, 0, G = constants.G)
+system = new_binary_from_orbital_elements(planet_mass,moon_mass,4 | units.AU, 0, G = constants.G)
 #move most massive object to 0,0,0
 system.position = system.position -system[0].position
 
@@ -97,7 +97,7 @@ triggered_injection = False
 
 
 #----------------------RUN THE SIMULATION----------------------
-while (hydro_code.model_time < 1 | units.day):
+while (hydro_code.model_time < 4 | units.day):
     #hydro_code.evolve_model(hydro_code.model_time + bridge.timestep)
     bridge.evolve_model(hydro_code.model_time + bridge.timestep)
 
@@ -105,7 +105,7 @@ while (hydro_code.model_time < 1 | units.day):
         #inject energy
         triggered_injection = True
         print("injecting energy")
-        inject_energy.inject_explosion_energy(hydro_code.gas_particles,explosion_energy=1.0e+25|units.erg,exploding_region=10|units.RSun)
+        inject_energy.inject_explosion_energy(hydro_code.gas_particles,explosion_energy=1.0e+50|units.erg,exploding_region=10|units.RSun)
         
     
     write_set_to_file(hydro_code.gas_particles, path+f'gas_particles_{index}.hdf5', overwrite_file=True)
@@ -123,7 +123,7 @@ systemplotter(hydro_code.dm_particles, xlabel='x', ylabel='y').plot(save="simula
 
 hydro_code.stop()
 gravity_code.stop()
-animator = Animator(path, xlabel='x', ylabel='y')
+animator = Animator(path, xlabel='x', ylabel='y',xlim=6,ylim=6)
 animator.make_animation(save_path='simulation_results/animation.mp4')
 
 
