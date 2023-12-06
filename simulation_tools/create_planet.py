@@ -12,11 +12,13 @@ from amuse.test.amusetest import get_path_to_results
 from amuse.community.mesa_r2208.interface import MESA
 from amuse.datamodel import Particles
 
+from amuse.units import units
+
 import os
 
 def setup_stellar_evolution_model():
-    out_pickle_file = os.path.join(get_path_to_results(), 
-                                   "super_giant_stellar_structure.pkl")
+    out_pickle_file = 'profiles/jupiter_like_planet_structure.pkl'# os.path.join(get_path_to_results(), 
+                                   # "super_giant_stellar_structure.pkl")
 
     stellar_evolution = MESA(redirection="none")
     stars = Particles(1)
@@ -32,6 +34,8 @@ def setup_stellar_evolution_model():
         while stellar_evolution.model_time<0.12|units.Myr:
             stellar_evolution.evolve_model()
             print("star:", stellar_evolution.particles[0].stellar_type, stellar_evolution.model_time.in_(units.Myr))
+            print('star mass:', stellar_evolution.particles[0].mass.in_(units.MJupiter))
+            print('star radius:', stellar_evolution.particles[0].radius.in_(units.RJupiter))
     except AmuseException as ex:
         print("Evolved star to", stellar_evolution.particles[0].age)
         print("Radius:", stellar_evolution.particles[0].radius)
@@ -43,6 +47,7 @@ def setup_stellar_evolution_model():
 pickle_file = setup_stellar_evolution_model()
 #pickle_file = './super_giant_stellar_structure.pkl'
 print("Star generated.")
+print(pickle_file)
 
 
 
