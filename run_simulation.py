@@ -19,10 +19,28 @@ import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 
-# ----------------------CREATE THE PLANET----------------------
+#-----------------------INPUT PARAMETERS-----------------------
+# characteristics of the planet
 number_of_sph_particles = 1000
-target_core_mass = 0.9 | units.MJupiter
+target_core_mass = 12 | units.MEarth # 0.5 | units.MJupiter
 pickle_file = 'simulation_tools/profiles/jupiter_like_planet_structure.pkl' # insert planet profile name from mesa
+
+# characteristics of the moon
+# moon_mass = 0.008 | units.MEarth # mass Europa, previously: 0.012*planet_mass
+moon_mass = 0.015 | units.MEarth # mass Io
+# distance_planet_moon = 671000 | units.km # distance Europa from jupiter
+distance_planet_moon = 421600 | units.km # distance Io and Jupiter
+eccentricity_moon = 0 # 0.009 for Europa, 0.004 for Io, but close enough to 0.
+
+# explosion
+outer_fraction = 0.1
+explosion_energy = 1.0e+46|units.erg
+
+# model evolution
+timestep = 6 | units.hour
+simulation_duration = 5 | units.day
+
+# ----------------------CREATE THE PLANET----------------------
 
 # for now create the model with planet_to_sph,
 # can only run after the profiles are complete in earth_profile/PREM.csv
@@ -45,14 +63,10 @@ core, gas_without_core, core_radius = \
 #---------------------Create a Moon --------------------
 #calcualte the planets total mass
 planet_mass = core.mass.sum() + gas_without_core.mass.sum()
-moon_mass = 0.008 | units.MEarth # mass Europa, previously: 0.012*planet_mass
-moon_mass = 0.015 | units.Mearth # mass Io
 
 #create binary system with the planet and the moon from orbital elements
-distance_planet_moon = 671000 | units.km # distance Europa from jupiter
-distance_planet_moon = 421600 | units.km # distance Io and Jupiter
-eccentricity = 0 # 0.009 for Europa, 0.004 for Io, but close enough to 0.
-system = new_binary_from_orbital_elements(planet_mass, moon_mass, distance_planet_moon, eccentricity, G = constants.G)
+
+system = new_binary_from_orbital_elements(planet_mass, moon_mass, distance_planet_moon, eccentricity_moon, G = constants.G)
 
 #move most massive object to 0,0,0
 system.position = system.position -system[0].position
@@ -73,7 +87,7 @@ print(moon.velocity.in_(units.kms))
 
 # add the hydroparticles to a hydrocode and run for some time to check if it's stable
 
-converter = nbody_system.nbody_to_si(10|units.MSun, core_radius)
+converter = nbody_system.nbody_to_si(1|units.MSun, core_radius)
 
 #setup hydro code
 hydro_code = Fi(converter, mode='openmp', redirection='none')
@@ -94,20 +108,20 @@ bridge.add_system(gravity_code, (hydro_code,))
 bridge.add_system(hydro_code, (gravity_code,))
 
 # Set the timestep for the bridge
-bridge.timestep = 4 | units.hour
+bridge.timestep = timestep
 
 
 
-path = 'simulation_results/jupiterlike_planet/'
-if not os.path.exists(path):
-    os.mkdir(path)
+path_results = 'simulation_results/jupiterlike_planet/'
+if not os.path.exists(path_results):
+    os.mkdir(path_results)
 
 index = 0
 triggered_injection = False
 
 
 #----------------------RUN THE SIMULATION----------------------
-while (hydro_code.model_time < 3 | units.day):
+while (hydro_code.model_time < simulation_duration):
     #hydro_code.evolve_model(hydro_code.model_time + bridge.timestep)
     bridge.evolve_model(hydro_code.model_time + bridge.timestep)
 
@@ -117,17 +131,15 @@ while (hydro_code.model_time < 3 | units.day):
         print("injecting energy")
         planet_radius = max([np.sqrt(pos.length_squared()) for pos in gas_without_core.position])
         
-        outer_fraction = 0.3
         explosion_radius = planet_radius - (planet_radius * outer_fraction)
         print(explosion_radius.in_(units.RJupiter))
-        explosion_energy = 9.0e+47|units.erg
 
         inject_energy.inject_explosion_energy(hydro_code.gas_particles,explosion_energy=explosion_energy, exploding_region=explosion_radius)
         
     
-    write_set_to_file(hydro_code.gas_particles, path+f'gas_particles_{index}.hdf5', overwrite_file=True)
-    write_set_to_file(hydro_code.dm_particles, path+f'dm_particles_{index}.hdf5', overwrite_file=True)
-    write_set_to_file(gravity_code.particles, path+f'gravity_particles_{index}.hdf5', overwrite_file=True)
+    write_set_to_file(hydro_code.gas_particles, path_results+f'gas_particles_{index}.hdf5', overwrite_file=True)
+    write_set_to_file(hydro_code.dm_particles, path_results+f'dm_particles_{index}.hdf5', overwrite_file=True)
+    write_set_to_file(gravity_code.particles, path_results+f'gravity_particles_{index}.hdf5', overwrite_file=True)
 
     index += 1
 
@@ -143,7 +155,7 @@ gravity_code.stop()
 
 
 path = 'simulation_results/jupiterlike_planet/'
-animator = Animator(path, xlabel='x', ylabel='y', xlim=0.02, ylim=0.02)
+animator = Animator(path, xlabel='x', ylabel='y', xlim=0.01, ylim=0.01)
 animator.make_animation(save_path='simulation_results/animation_jup.mp4')
 
 
