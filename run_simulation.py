@@ -21,24 +21,24 @@ import numpy as np
 
 #-----------------------INPUT PARAMETERS-----------------------
 # characteristics of the planet
-number_of_sph_particles = 1000
+number_of_sph_particles = 20000
 target_core_mass = 12 | units.MEarth # 0.5 | units.MJupiter
 pickle_file = 'simulation_tools/profiles/jupiter_like_planet_structure.pkl' # insert planet profile name from mesa
 
 # characteristics of the moon
 # moon_mass = 0.008 | units.MEarth # mass Europa, previously: 0.012*planet_mass
-moon_mass = 0.015 | units.MEarth # mass Io
+moon_mass = 5 | units.MEarth # 10 x mass Io
 # distance_planet_moon = 671000 | units.km # distance Europa from jupiter
-distance_planet_moon = 421600 | units.km # distance Io and Jupiter
+distance_planet_moon = 621600 | units.km # distance Io and Jupiter
 eccentricity_moon = 0 # 0.009 for Europa, 0.004 for Io, but close enough to 0.
 
 # explosion
-outer_fraction = 0.1
-explosion_energy = 1.0e+46|units.erg
+outer_fraction = 0.3
+explosion_energy = 6.0e+42|units.erg
 
 # model evolution
 timestep = 6 | units.hour
-simulation_duration = 5 | units.day
+simulation_duration = 6 | units.day
 
 # ----------------------CREATE THE PLANET----------------------
 
@@ -63,7 +63,7 @@ core, gas_without_core, core_radius = \
 #---------------------Create a Moon --------------------
 #calcualte the planets total mass
 planet_mass = core.mass.sum() + gas_without_core.mass.sum()
-
+print('planet mass:', planet_mass.in_(units.MJupiter))
 #create binary system with the planet and the moon from orbital elements
 
 system = new_binary_from_orbital_elements(planet_mass, moon_mass, distance_planet_moon, eccentricity_moon, G = constants.G)
@@ -125,8 +125,10 @@ while (hydro_code.model_time < simulation_duration):
     #hydro_code.evolve_model(hydro_code.model_time + bridge.timestep)
     bridge.evolve_model(hydro_code.model_time + bridge.timestep)
 
+    print('Time=', hydro_code.model_time.in_(units.hour))
     if (hydro_code.model_time.value_in(units.hour) >= 24) & (triggered_injection == False): #do something at the 6th timestep( 6 hours in)   
         #inject energy
+        
         triggered_injection = True
         print("injecting energy")
         planet_radius = max([np.sqrt(pos.length_squared()) for pos in gas_without_core.position])
@@ -155,7 +157,7 @@ gravity_code.stop()
 
 
 path = 'simulation_results/jupiterlike_planet/'
-animator = Animator(path, xlabel='x', ylabel='y', xlim=0.01, ylim=0.01)
+animator = Animator(path, xlabel='x', ylabel='y', xlim=0.005, ylim=0.005)
 animator.make_animation(save_path='simulation_results/animation_jup.mp4')
 
 
