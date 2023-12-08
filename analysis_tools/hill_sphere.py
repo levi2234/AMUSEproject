@@ -6,15 +6,31 @@ import os
 from amuse.io import read_set_from_file
 from amuse.io import write_set_to_file
 
+def distance(object1, object2, unit=u.m):
+    x_term = (object1.x.value_in(unit) - object2.x.value_in(unit))**2
+    y_term = (object1.y.value_in(unit) - object2.y.value_in(unit))**2
+    z_term = (object1.z.value_in(unit) - object2.z.value_in(unit))**2
+    return np.sqrt(x_term + y_term + z_term)
 
 def hill_radius(m,M,a,e): 
     return (a*(1-e))*((m/(3*M))**(1/3))
 
+def add_hill_sphere_attributes(gas_particles, rh_planet, rh_moon):
+ 
+    distance_to_planet = distance(gas_particles, dm_part[0])
+    gas_particles.in_hill_planet = np.zeros(len(gas_particles))
+    mask = distance_to_planet < rh_planet
+    gas_particles.in_hill_planet[mask] = 1
+        
+    distance_to_moon = distance(gas_particles, gravity_part[0])
+    gas_particles.in_hill_moon = np.zeros(len(gas_particles))
+    mask = distance_to_moon < rh_moon
+    gas_particles.in_hill_moon[mask] = 1
     
 if __name__ == "__main__": 
     
     #navigate to the directory where the h5 files is located relative to this file
-    os.chdir("../simulation_results/test_planet") #change the folder to the folder where the h5 file is located
+    os.chdir("../simulation_results/jupiterlike_planet") #change the folder to the folder where the h5 file is located
     files = os.listdir() #list all files in the directory
 
 
@@ -36,24 +52,11 @@ if __name__ == "__main__":
         a = a.value_in(u.m)
         
         M = dm_part[0].mass.value_in(u.kg) + gravity_part[0].mass.value_in(u.kg)
-        rh_planet = hill_radius(dm_part[0].mass.value_in(u.kg),M,a,0) #(beware to set the eccentricity to an appropriate value)
-        rh_moon = hill_radius(gravity_part[0].mass.value_in(u.kg),M,a,0) #(beware to set the eccentricity to an appropriate value)
+        eccentricity = 0
+        rh_planet = hill_radius(dm_part[0].mass.value_in(u.kg), M, a, eccentricity) #(beware to set the eccentricity to an appropriate value)
+        rh_moon = hill_radius(gravity_part[0].mass.value_in(u.kg), M, a, eccentricity) #(beware to set the eccentricity to an appropriate value)
         
-        for i in gas_part:
-            
-            r_to_planet = np.sqrt((i.x-dm_part[0].x)**2 + (i.y-dm_part[0].y)**2 + (i.z-dm_part[0].z)**2)
-            r_to_planet = r_to_planet.value_in(u.m)
-            if r_to_planet < rh_planet:
-                i.in_hill_planet = 1
-            else:
-                i.in_hill_planet = 0
-            
-            r_to_moon = np.sqrt((i.x-gravity_part[0].x)**2 + (i.y-gravity_part[0].y)**2 + (i.z-gravity_part[0].z)**2)
-            r_to_moon = r_to_moon.value_in(u.m)
-            if r_to_moon < rh_moon:
-                i.in_hill_moon = 1
-            else:
-                i.in_hill_moon = 0
+        add_hill_sphere_attributes(gas_part, rh_planet, rh_moon)
         
         write_set_to_file(gas_part, f"gas_particles_{j}.hdf5", "hdf5", overwrite_file=True)
 

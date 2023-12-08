@@ -21,12 +21,47 @@ def binding_energy(m1,m2,r, v): #here m1 is the mass of the planet, m2 is the ma
     binding_energy = U+T
    
     return binding_energy
+
+def speed(particle_set, unit=u.m/u.s):
+    x_term = particle_set.vx.value_in(unit)**2
+    y_term = particle_set.vy.value_in(unit)**2
+    z_term = particle_set.vz.value_in(unit)**2
+    return np.sqrt(x_term + y_term + z_term)
+
+def distance(object1, object2, unit=u.m):
+    x_term = (object1.x.value_in(unit) - object2.x.value_in(unit))**2
+    y_term = (object1.y.value_in(unit) - object2.y.value_in(unit))**2
+    z_term = (object1.z.value_in(unit) - object2.z.value_in(unit))**2
+    return np.sqrt(x_term + y_term + z_term)   
+
+def add_binding_energy_attributes(gas_particles):
     
+    gas_speed = speed(gas_particles)
     
+    distance_to_planet = distance(gas_particles, dm_part[0])
+    E_binding_to_planet = binding_energy(m1=dm_part[0].mass.value_in(u.kg), \
+                                         m2=gas_particles.mass.value_in(u.kg),\
+                                         r=distance_to_planet,\
+                                         v=gas_speed)
+    
+    distance_to_moon = distance(gas_particles, gravity_part[0])
+    E_binding_to_moon = binding_energy(m1=gravity_part[0].mass.value_in(u.kg),
+                                       m2=gas_particles.mass.value_in(u.kg),
+                                       r=distance_to_moon,
+                                       v=gas_speed)
+    
+    gas_particles.bound_to_planet = np.zeros(len(gas_particles))
+    mask = (E_binding_to_planet < 0) & (E_binding_to_planet < E_binding_to_moon)
+    gas_particles.bound_to_planet[mask] = 1
+
+    gas_particles.bound_to_moon = np.zeros(len(gas_particles))
+    mask = (E_binding_to_planet < 0) & (E_binding_to_planet > E_binding_to_moon)
+    gas_particles.bound_to_moon[mask] = 1
+
 if __name__ == "__main__": 
     
     #navigate to the directory where the h5 files is located relative to this file
-    os.chdir("../simulation_results/test_planet") #change the folder to the folder where the h5 file is located
+    os.chdir("../simulation_results/jupiterlike_planet") #change the folder to the folder where the h5 file is located
     files = os.listdir() #list all files in the directory
 
 
@@ -45,33 +80,9 @@ if __name__ == "__main__":
             print(f"file {j} not found for either dm, gas or gravity particles")
             continue
         
-    
-        for i in gas_part: 
-            
-            gas_speed = np.sqrt(i.vx**2 + i.vy**2 + i.vz**2).value_in(u.m/u.s)
-            
-            #calculate the binding energy of the gas to the planet
-            r_to_planet = np.sqrt((i.x-dm_part[0].x)**2 + (i.y-dm_part[0].y)**2 + (i.z-dm_part[0].z)**2)
-            r_to_planet = r_to_planet.value_in(u.m)
-            E_binding_to_planet = binding_energy(dm_part[0].mass.value_in(u.kg),i.mass.value_in(u.kg),r_to_planet, gas_speed)
-            
-                        
-            #calculate the binding energy of the gas to the moon
-            r_to_moon = np.sqrt((i.x-gravity_part[0].x)**2 + (i.y-gravity_part[0].y)**2 + (i.z-gravity_part[0].z)**2)
-            r_to_moon = r_to_moon.value_in(u.m)
-            E_binding_to_moon = binding_energy(gravity_part[0].mass.value_in(u.kg),i.mass.value_in(u.kg),r_to_moon, gas_speed)
-            
-            if (E_binding_to_planet < 0) & (E_binding_to_planet < E_binding_to_moon):
-                i.bound_to_planet = 1
-            else:
-                i.bound_to_planet = 0
-            
+        add_binding_energy_attributes(gas_part)
 
-            if (E_binding_to_planet < 0) & (E_binding_to_planet > E_binding_to_moon):
-                i.bound_to_moon = 1
-            else:
-                i.bound_to_moon = 0
-                
+       
         write_set_to_file(gas_part, f"gas_particles_{j}.hdf5", "hdf5", overwrite_file=True)
                 
     # snapshot = read_set_from_file(f"gas_particles_0.hdf5", "hdf5")

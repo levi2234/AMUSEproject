@@ -9,7 +9,7 @@ from amuse.io import write_set_to_file
 if __name__ == "__main__": 
     
     #navigate to the directory where the h5 files is located relative to this file
-    os.chdir("../simulation_results/test_planet") #change the folder to the folder where the h5 file is located
+    os.chdir("../simulation_results/jupiterlike_planet") #change the folder to the folder where the h5 file is located
     files = os.listdir() #list all files in the directory
 
 
@@ -60,7 +60,9 @@ if __name__ == "__main__":
     plt.ylabel("percentage")
     plt.title("percentage of gas particles bound to the planet and the moon")
     plt.savefig("../binding_percentage.png")
-        
+
+    print('end: moon hill percentage = ', moon_hill_contained_percentage[-1])
+    print('end: moon bound percentage = ', moon_bound_percentage[-1])
         
     
         
