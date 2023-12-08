@@ -47,16 +47,16 @@ class systemplotter:
     
         
     def plot(self, save=True,c="blue", close=True,**kwargs):
-        for systemobject in self.system: 
-            xaxisval = self.dynamic_accessor(systemobject, self.xaxis).value_in(units.km)
-            yaxisval = self.dynamic_accessor(systemobject, self.yaxis).value_in(units.km)
-            
-            try: 
-                objectlabel = self.dynamic_accessor(systemobject, "name")
-            except: 
-                objectlabel = None
-            plt.scatter(xaxisval,yaxisval,label = objectlabel,c=c,**kwargs)
-            plt.axis('equal')
+        
+        xaxisval = self.dynamic_accessor(self.system, self.xaxis).value_in(units.km)
+        yaxisval = self.dynamic_accessor(self.system, self.yaxis).value_in(units.km)
+        
+        try: 
+            objectlabel = self.dynamic_accessor(self.system, "name")
+        except: 
+            objectlabel = None
+        plt.scatter(xaxisval,yaxisval,label = objectlabel,c=c,**kwargs)
+        plt.axis('equal')
         if close==False:
             return  
             

@@ -102,10 +102,9 @@ gravity_code.parameters.epsilon_squared = core_radius**2
 gravity_code.particles.add_particles(moon)
 
 #setup the bridge
-# Create the bridge
 bridge = Bridge(use_threading=False)
-bridge.add_system(gravity_code, (hydro_code,))
-bridge.add_system(hydro_code, (gravity_code,))
+bridge.add_system(gravity_code, (hydro_code,)) #makes sure planet/atmosphere particles are affected by gravity
+bridge.add_system(hydro_code, (gravity_code,)) #makes sure moon is also affected by hydrodynamics and stays in orbit
 
 # Set the timestep for the bridge
 bridge.timestep = timestep
@@ -118,6 +117,11 @@ if not os.path.exists(path_results):
 
 index = 0
 triggered_injection = False
+
+#----------------------BEFORE PLOT-----------------------
+systemplotter(hydro_code.gas_particles, xlabel='x', ylabel='y').plot(save="simulation_results/planetbefore.png", c="b",s=2, close=False)
+systemplotter(gravity_code.particles, xlabel='x', ylabel='y').plot(save="simulation_results/planetbefore.png", c="r",s=40, close=False)
+systemplotter(hydro_code.dm_particles, xlabel='x', ylabel='y').plot(save="simulation_results/testplanetBefore.png", c="r",s=20)
 
 
 #----------------------RUN THE SIMULATION----------------------
@@ -152,6 +156,8 @@ while (hydro_code.model_time < simulation_duration):
 # systemplotter(gravity_code.particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="r",s=40, close=False)
 # systemplotter(hydro_code.dm_particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="r",s=20)
 
+
+#----------------------STOP THE SIMULATION-----------------------
 hydro_code.stop()
 gravity_code.stop()
 
