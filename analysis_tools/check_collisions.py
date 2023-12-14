@@ -2,6 +2,8 @@ from amuse.units import units as u
 from amuse.units import constants as c
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.stats import norm
+from scipy.stats import normaltest
 from amuse.datamodel import Particles
 import os
 #load h5 file
@@ -61,7 +63,6 @@ if __name__ == "__main__":
     from scipy.stats import norm
     Z=np.array(velocities_list)
     mu,std=norm.fit(Z)
-    #print((velocities_list))
     print(total_collisions)
     plt.hist(velocities_list,bins=10,density=True)
     xmin, xmax = plt.xlim() 
@@ -70,22 +71,18 @@ if __name__ == "__main__":
     plt.plot(x,p,'k-') 
     plt.show()
     N=len(Z)
-    H,X1 = np.histogram( Z, bins = 8
-                        , density = True )
-    dx = X1[1] - X1[0]
-    F1 = np.cumsum(H)*dx
-    #method 2
+
     X2 = np.sort(Z)
     F2 = np.array(range(N))/float(N)
     
-    
-    #plt.plot(X1[1:], F1)
-    plt.plot(X2, F2)
-    plt.plot(X2, norm.cdf(X2,mu,std))
-
+    p_value=np.round(normaltest(Z)[1],2)
+    plt.plot(X2, F2,label='Simulation results')
+    plt.plot(X2, norm.cdf(X2,mu,std),label='Gaussian fit')
+    plt.xlabel('Velocity [m/s]')
+    plt.ylabel('Cumulative distribution function')
+    plt.title('Velocity of particles that reach the Hill sphere of the moon')
+    plt.text(0.6, 0.5, f'p-value$={p_value}$', transform=plt.gca().transAxes)
+    plt.legend()
     plt.show()
-    #plt.hist(Z,bins=30,density=True)
-    from scipy.stats import normaltest
-    print(normaltest(Z))
     print(norm.cdf(0,mu,std))
-    
+

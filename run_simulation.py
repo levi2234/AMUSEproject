@@ -35,7 +35,7 @@ R_hill_moon=1.07*1e8
 
 # explosion
 outer_fraction = 0.9
-explosion_energy = 6.5e+42|units.erg
+explosion_energy = 6.1e+42|units.erg
 
 # model evolution
 timestep = 0.5 | units.hour
