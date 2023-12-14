@@ -21,24 +21,25 @@ import numpy as np
 
 #-----------------------INPUT PARAMETERS-----------------------
 # characteristics of the planet
-number_of_sph_particles = 20000
-target_core_mass = 12 | units.MEarth # 0.5 | units.MJupiter
+number_of_sph_particles = 2000
+target_core_mass = 300 | units.MEarth # 0.5 | units.MJupiter
 pickle_file = 'simulation_tools/profiles/jupiter_like_planet_structure.pkl' # insert planet profile name from mesa
 
 # characteristics of the moon
 # moon_mass = 0.008 | units.MEarth # mass Europa, previously: 0.012*planet_mass
-moon_mass = 5 | units.MEarth # 10 x mass Io
+moon_mass = 20 | units.MEarth # 10 x mass Io
 # distance_planet_moon = 671000 | units.km # distance Europa from jupiter
-distance_planet_moon = 621600 | units.km # distance Io and Jupiter
+distance_planet_moon = 421600 | units.km # distance Io and Jupiter
 eccentricity_moon = 0 # 0.009 for Europa, 0.004 for Io, but close enough to 0.
+R_hill_moon=1.07*1e8
 
 # explosion
-outer_fraction = 0.3
-explosion_energy = 6.0e+42|units.erg
+outer_fraction = 0.9
+explosion_energy = 6.5e+42|units.erg
 
 # model evolution
-timestep = 6 | units.hour
-simulation_duration = 6 | units.day
+timestep = 0.5 | units.hour
+simulation_duration = 4 | units.day
 
 # ----------------------CREATE THE PLANET----------------------
 
@@ -77,6 +78,19 @@ moon.mass = moon_mass
 moon.position = system[1].position
 moon.velocity = system[1].velocity
 print(moon.velocity.in_(units.kms))
+moon_radius= 2e6 #in meters
+
+system = new_binary_from_orbital_elements(planet_mass, 1|units.MSun, 1|units.AU, 0, G = constants.G)
+
+#move most massive object to 0,0,0
+system.position = system.position -system[0].position
+
+#add moon to own particle set (could be done better but this only works for 2 objects)
+sun = Particles(1)
+sun.mass = 1|units.MSun
+sun.position = system[1].position
+sun.velocity = system[1].velocity
+
 
 #----------------------BEFORE PLOT-----------------------
 # plt.scatter(gas_without_core.x.value_in(units.AU), gas_without_core.y.value_in(units.AU),c="blue", marker='o')
@@ -100,6 +114,7 @@ hydro_code.dm_particles.add_particle(core)
 gravity_code = BHTree(converter)
 gravity_code.parameters.epsilon_squared = core_radius**2
 gravity_code.particles.add_particles(moon)
+gravity_code.particles.add_particles(sun)
 
 #setup the bridge
 bridge = Bridge(use_threading=False)
@@ -111,7 +126,7 @@ bridge.timestep = timestep
 
 
 
-path_results = 'simulation_results/jupiterlike_planet/'
+path_results = 'simulation_results/jupiterlike_planettest_fast/'
 if not os.path.exists(path_results):
     os.mkdir(path_results)
 
@@ -129,7 +144,7 @@ while (hydro_code.model_time < simulation_duration):
     #hydro_code.evolve_model(hydro_code.model_time + bridge.timestep)
     bridge.evolve_model(hydro_code.model_time + bridge.timestep)
 
-    print('Time=', hydro_code.model_time.in_(units.hour))
+    #print('Time=', hydro_code.model_time.in_(units.hour))
     if (hydro_code.model_time.value_in(units.hour) >= 24) & (triggered_injection == False): #do something at the 6th timestep( 6 hours in)   
         #inject energy
         
@@ -162,9 +177,9 @@ hydro_code.stop()
 gravity_code.stop()
 
 
-path = 'simulation_results/jupiterlike_planet/'
+path = 'simulation_results/jupiterlike_planettest_fast/'
 animator = Animator(path, xlabel='x', ylabel='y', xlim=0.005, ylim=0.005)
-animator.make_animation(save_path='simulation_results/animation_jup.mp4')
+animator.make_animation(save_path='simulation_results/animation_jup_2.mp4')
 
 
 
