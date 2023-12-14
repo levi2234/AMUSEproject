@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from amuse.units import units as u
 from amuse.units import constants as c
 import matplotlib.pyplot as plt
@@ -31,6 +33,17 @@ def check_collisions(object1,object2,radius_object_2):
     velocities=velocity_modulus(object1[indexes_particles])
     return number_of_collisions,velocities
 
+def velocity_cdf(velocity_list):
+    velocities_array=np.array(velocities_list)
+    p_value=np.round(normaltest(velocities_array)[1],2)
+    mu,std=norm.fit(velocities_array)
+    N=len(velocities_array)
+    sorted_velocities = np.sort(velocities_array)
+    empirical_CDF = np.array(range(N))/float(N)
+    normal_CDF = norm.cdf(sorted_velocities,mu,std)
+    probability_zero_vel=(norm.cdf(0,mu,std))
+    return sorted_velocities, empirical_CDF, normal_CDF,p_value,probability_zero_vel
+
 if __name__ == "__main__": 
     
     #navigate to the directory where the h5 files is located relative to this file
@@ -60,29 +73,19 @@ if __name__ == "__main__":
 
 
         print(collisions)
-    from scipy.stats import norm
-    Z=np.array(velocities_list)
-    mu,std=norm.fit(Z)
-    print(total_collisions)
-    plt.hist(velocities_list,bins=10,density=True)
-    xmin, xmax = plt.xlim() 
-    x = np.linspace(xmin, xmax, 100) 
-    p = norm.pdf(x, mu, std)
-    plt.plot(x,p,'k-') 
-    plt.show()
-    N=len(Z)
 
-    X2 = np.sort(Z)
-    F2 = np.array(range(N))/float(N)
-    
-    p_value=np.round(normaltest(Z)[1],2)
-    plt.plot(X2, F2,label='Simulation results')
-    plt.plot(X2, norm.cdf(X2,mu,std),label='Gaussian fit')
+    #path_results = '/data2/presa/AMUSEproject/simulation_results/probability_distributions/'
+    #path_results = Path.cwd().parent/'probability_distributions'
+    #if not os.path.exists(path_results):
+    #    os.mkdir(path_results)
+    velocities,empirical_cdf,normal_cdf,pvalue,probability_v0=velocity_cdf(velocities_list)
+    plt.plot(velocities, empirical_cdf,label='Simulation results')
+    plt.plot(velocities, normal_cdf,label='Gaussian fit')
     plt.xlabel('Velocity [m/s]')
     plt.ylabel('Cumulative distribution function')
     plt.title('Velocity of particles that reach the Hill sphere of the moon')
-    plt.text(0.6, 0.5, f'p-value$={p_value}$', transform=plt.gca().transAxes)
+    plt.text(0.6, 0.5, f'p-value$={pvalue}$', transform=plt.gca().transAxes)
     plt.legend()
     plt.show()
-    print(norm.cdf(0,mu,std))
+ 
 
