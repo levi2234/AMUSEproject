@@ -72,8 +72,8 @@ if __name__ == "__main__":
             velocities_list.append(particle_velocity)
 
 
-        print(collisions)
-
+        #print(collisions)
+    print(total_collisions)
     #path_results = '/data2/presa/AMUSEproject/simulation_results/probability_distributions/'
     #path_results = Path.cwd().parent/'probability_distributions'
     #if not os.path.exists(path_results):
