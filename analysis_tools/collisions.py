@@ -47,7 +47,7 @@ def velocity_cdf(velocity_list):
 if __name__ == "__main__": 
     
     #navigate to the directory where the h5 files is located relative to this file
-    os.chdir("../simulation_results/jupiterlike_planettest_fast") #change the folder to the folder where the h5 file is located
+    os.chdir("../simulation_results/energies_results/6.7e+42 erg") #change the folder to the folder where the h5 file is located
     files = os.listdir() #list all files in the directory
 
 
@@ -87,5 +87,9 @@ if __name__ == "__main__":
     plt.text(0.6, 0.5, f'p-value$={pvalue}$', transform=plt.gca().transAxes)
     plt.legend()
     plt.show()
+    plt.hist(velocities)
+    plt.show()
+    print('Probability of capture: ')
+    print(probability_v0*total_collisions/2000)
  
 

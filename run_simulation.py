@@ -27,7 +27,7 @@ pickle_file = 'simulation_tools/profiles/jupiter_like_planet_structure.pkl' # in
 
 # characteristics of the moon
 # moon_mass = 0.008 | units.MEarth # mass Europa, previously: 0.012*planet_mass
-moon_mass = 5 | units.MEarth # 10 x mass Io
+moon_mass = 20 | units.MEarth # 10 x mass Io
 # distance_planet_moon = 671000 | units.km # distance Europa from jupiter
 distance_planet_moon = 421600 | units.km # distance Io and Jupiter
 eccentricity_moon = 0 # 0.009 for Europa, 0.004 for Io, but close enough to 0.
