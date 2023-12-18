@@ -44,13 +44,16 @@ def velocity_cdf(velocity_list):
     probability_zero_vel=(norm.cdf(0,mu,std))
     return sorted_velocities, empirical_CDF, normal_CDF,p_value,probability_zero_vel
 
-explosion_energies=np.arange(1,10.1,0.3)*1e42|u.erg
+#explosion_energies=np.arange(1,10.1,0.3)*1e42|u.erg
+explosion_energies=[11800,12000,12100,12100,12350,12375,
+                    12400,12450,12475,12500,12525,12550,12575,12600,12700,12900,13200]
 current_dir=os.getcwd()
 accreted_fraction={}
 if __name__ == "__main__": 
     for impact_energy in explosion_energies:
         #navigate to the directory where the h5 files is located relative to this file
-        os.chdir("../simulation_results/energies_results/{}".format(impact_energy,'g')) 
+        #os.chdir("../simulation_results/energies_results/{}".format(impact_energy,'g')) 
+        os.chdir("../simulation_results/earth_planet/Earth_planet_{}ms".format(impact_energy,'g'))  
         files = os.listdir() #list all files in the directory
 
 
@@ -69,7 +72,7 @@ if __name__ == "__main__":
             except:
                 print(f"file {j} not found for either dm, gas or gravity particles")
                 continue
-            collisions,velocities=check_collisions(gas_part,gravity_part[0],1.18*10**8)
+            collisions,velocities=check_collisions(gas_part,gravity_part[0],6.15*10**7)
             total_collisions+=collisions
             for particle_velocity in velocities:
                 velocities_list.append(particle_velocity)
@@ -77,51 +80,63 @@ if __name__ == "__main__":
 
             #print(collisions)
         os.chdir(current_dir)
+        print(total_collisions)
         if total_collisions != 0:
             velocities,empirical_cdf,normal_cdf,pvalue,probability_v0=velocity_cdf(velocities_list)
             plt.plot(velocities, empirical_cdf,label='Simulation results')
             plt.plot(velocities, normal_cdf,label='Gaussian fit')
             plt.xlabel('Velocity [m/s]')
             plt.ylabel('Cumulative distribution function')
-            plt.title('{}'.format(impact_energy,'g'))
+            #plt.title('{}'.format(impact_energy,'g'))
             plt.text(0.6, 0.5, f'p-value$={pvalue}$', transform=plt.gca().transAxes)
             plt.legend()
-            plt.savefig('../simulation_results/jupiter_0.05ratio/CDF{}.png'.format(impact_energy,'g'))
+            plt.show()
+            #plt.savefig('../simulation_results/jupiter_0.05ratio/CDF{}.png'.format(impact_energy,'g'))
             plt.clf()
+            # uncomment to show histograms as well
+            #plt.hist(velocities,density=True)
+            #plt.xlabel('Velocity [m/s]')
+            #plt.ylabel('Density')
+            #plt.title('{}'.format(impact_energy,'g'))
+            #plt.savefig('../simulation_results/jupiter_0.05ratio/PDF{}.png'.format(impact_energy,'g'))
+            #plt.clf()
             if pvalue > 0.2:
-                accreted_fraction[format(impact_energy.value_in(u.erg),'g')]=probability_v0*total_collisions/2000
-
-        #plt.plot(velocities, empirical_cdf,label='Simulation results')
-        #plt.plot(velocities, normal_cdf,label='Gaussian fit')
-        #plt.xlabel('Velocity [m/s]')
-        #plt.ylabel('Cumulative distribution function')
-        #plt.title('{}'.format(impact_energy,'g'))
-        #plt.text(0.6, 0.5, f'p-value$={pvalue}$', transform=plt.gca().transAxes)
-        #plt.legend()
-        #plt.savefig('../simulation_results/jupiter_0.05ratio/CDF{}.png'.format(impact_energy.value_in(u.erg),'g'))
-        #plt.hist(velocities)
-        #plt.show()
-        #print('Probability of capture: ')
-        #print(probability_v0*total_collisions/2000)
-    #print(accreted_fraction)
+                #accreted_fraction[format(impact_energy.value_in(u.erg),'g')]=probability_v0*total_collisions/2000
+                accreted_fraction[format(impact_energy,'g')]=probability_v0*total_collisions/50000
+            print(accreted_fraction)
     energies = list(map(float, accreted_fraction.keys()))
     fractions = list(accreted_fraction.values())
 
-    plt.rcParams['figure.dpi'] = 150    
-    plt.loglog(energies, fractions, marker='o', linestyle='-',color='g')
-    plt.axvspan(0, 2.3 * 10**42, alpha=0.3, color='grey')  
-    plt.axvspan(6.5 * 10**42, 3*10**43, alpha=0.3, color='grey')
-    plt.axvspan(2.3 * 10**42, 6.5*10**42, alpha=0.3, color='green')
-    plt.text(0.5, 0.5, 'Accretion' ,transform=plt.gca().transAxes,weight='bold',color='g')
-    plt.text(0.5, 0.45, 'window' ,transform=plt.gca().transAxes,weight='bold',color='g')
+    #plt.rcParams['figure.dpi'] = 150    
+    #plt.loglog(energies, fractions, marker='o', linestyle='-',color='g')
+    #plt.axvspan(0, 2.3 * 10**42, alpha=0.3, color='grey')  
+    #plt.axvspan(6.5 * 10**42, 3*10**43, alpha=0.3, color='grey')
+    #plt.axvspan(2.3 * 10**42, 6.5*10**42, alpha=0.3, color='green')
+    #plt.text(0.5, 0.5, 'Accretion' ,transform=plt.gca().transAxes,weight='bold',color='g')
+    #plt.text(0.5, 0.45, 'window' ,transform=plt.gca().transAxes,weight='bold',color='g')
+    #plt.text(0.02, 0.8, 'Low velocity region' ,transform=plt.gca().transAxes,weight='bold')
+    #plt.text(0.03, 0.6, 'Collisionless regime' ,transform=plt.gca().transAxes,weight='normal')
+    #plt.text(0.73, 0.6, 'Escape regime' ,transform=plt.gca().transAxes,weight='normal')
+    #plt.text(0.675, 0.8, 'High velocity region' , transform=plt.gca().transAxes,weight='bold')
+    #plt.xlabel('Energy of the explosion [erg]')
+    #plt.ylabel('Captured mass fraction')
+    #plt.title('Fraction of the ejected atmosphere captured by the moon') 
+    #plt.xlim(8e41,1.85e43)
+    #custom_ticks = [1e42, 5e42, 1e43]
+    #plt.xticks(custom_ticks, [f'{tick:.0e}' for tick in custom_ticks])
+    #plt.show()
+    plt.semilogy(energies, fractions, marker='o', linestyle='-',color='g')
+    plt.axvspan(0, 12449, alpha=0.3, color='grey')  
+    plt.axvspan(13201, 100000, alpha=0.3, color='grey')
+    plt.axvspan(12449, 13200, alpha=0.3, color='green')
+    plt.text(0.48, 0.5, 'Accretion' ,transform=plt.gca().transAxes,weight='bold',color='g')
+    plt.text(0.48, 0.45, 'window' ,transform=plt.gca().transAxes,weight='bold',color='g')
     plt.text(0.02, 0.8, 'Low velocity region' ,transform=plt.gca().transAxes,weight='bold')
     plt.text(0.03, 0.6, 'Collisionless regime' ,transform=plt.gca().transAxes,weight='normal')
     plt.text(0.73, 0.6, 'Escape regime' ,transform=plt.gca().transAxes,weight='normal')
     plt.text(0.675, 0.8, 'High velocity region' , transform=plt.gca().transAxes,weight='bold')
-    plt.xlabel('Energy of the explosion [erg]')
+    plt.xlabel('Velocity of the ejected particles [m/s]')
     plt.ylabel('Captured mass fraction')
     plt.title('Fraction of the ejected atmosphere captured by the moon') 
-    plt.xlim(8e41,1.85e43)
-    custom_ticks = [1e42, 5e42, 1e43]
-    plt.xticks(custom_ticks, [f'{tick:.0e}' for tick in custom_ticks])
-    plt.savefig('../simulation_results/jupiter_0.05ratio/fraction.png')
+    plt.xlim(11500,14100)
+    plt.savefig('../simulation_results/earth_0.01ratio/fraction_earth.png')
