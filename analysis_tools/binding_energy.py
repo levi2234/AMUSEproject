@@ -55,7 +55,7 @@ def add_binding_energy_attributes(gas_particles):
     gas_particles.bound_to_planet[mask] = 1
 
     gas_particles.bound_to_moon = np.zeros(len(gas_particles))
-    mask = (E_binding_to_planet < 0) & (E_binding_to_planet > E_binding_to_moon)
+    mask = (E_binding_to_moon < 0) & (E_binding_to_planet > E_binding_to_moon)
     gas_particles.bound_to_moon[mask] = 1
 
 if __name__ == "__main__": 

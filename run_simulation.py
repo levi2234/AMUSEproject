@@ -34,7 +34,7 @@ eccentricity_moon = 0 # 0.009 for Europa, 0.004 for Io, but close enough to 0.
 
 # explosion
 outer_fraction = 0.3
-explosion_energy = 6.0e+42|units.erg
+explosion_energy = 5.0e+42|units.erg
 
 # model evolution
 timestep = 6 | units.hour
@@ -119,9 +119,9 @@ index = 0
 triggered_injection = False
 
 #----------------------BEFORE PLOT-----------------------
-systemplotter(hydro_code.gas_particles, xlabel='x', ylabel='y').plot(save="simulation_results/planetbefore.png", c="b",s=2, close=False)
-systemplotter(gravity_code.particles, xlabel='x', ylabel='y').plot(save="simulation_results/planetbefore.png", c="r",s=40, close=False)
-systemplotter(hydro_code.dm_particles, xlabel='x', ylabel='y').plot(save="simulation_results/testplanetBefore.png", c="r",s=20)
+# systemplotter(hydro_code.gas_particles, xlabel='x', ylabel='y').plot(save="simulation_results/planetbefore.png", c="b",s=2, close=False)
+# systemplotter(gravity_code.particles, xlabel='x', ylabel='y').plot(save="simulation_results/planetbefore.png", c="r",s=40, close=False)
+# systemplotter(hydro_code.dm_particles, xlabel='x', ylabel='y').plot(save="simulation_results/testplanetBefore.png", c="r",s=20)
 
 
 #----------------------RUN THE SIMULATION----------------------
