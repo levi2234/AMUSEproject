@@ -51,18 +51,26 @@ if __name__ == "__main__":
     #plot the results
     import matplotlib.pyplot as plt
     plt.figure(figsize=(10,10))
-    plt.plot(file_numbers, planet_hill_contained_percentage, label="planet hill contained")
+    plt.plot(file_numbers, 1- np.array(planet_hill_contained_percentage), label="planet hill contained")
     plt.plot(file_numbers, moon_hill_contained_percentage, label="moon hill contained")
-    plt.plot(file_numbers, planet_bound_percentage, label="planet bound")
+    plt.plot(file_numbers, 1 - np.array(planet_bound_percentage), label="planet bound")
     plt.plot(file_numbers, moon_bound_percentage, label="moon bound")
     plt.legend()
-    plt.xlabel("file number")
+    plt.xlabel("step")
     plt.ylabel("percentage")
     plt.title("percentage of gas particles bound to the planet and the moon")
     plt.savefig("../binding_percentage.png")
 
     print('end: moon hill percentage = ', moon_hill_contained_percentage[-1])
     print('end: moon bound percentage = ', moon_bound_percentage[-1])
+
+    print('anywhere hill:', (np.array(moon_hill_contained_percentage)>0).any())
+    print('anywhere bound:', (np.array(moon_bound_percentage)>0).any())
+
+    print(np.where(np.array(moon_bound_percentage)>0))
+    print(moon_bound_percentage)
+    print(moon_hill_contained_percentage)
+    
         
     
         

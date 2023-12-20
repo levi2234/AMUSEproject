@@ -1,6 +1,10 @@
 simulation_results/
 output.del
 anlaysis_tools/__pycache__/
+simulation_tools/__pycache__/
+simulation_tools/__pycache__/inject_energy.cpython-311.pyc
+analysis_tools/__pycache__/plot_system.cpython-311.pyc
+analysis_tools/__pycache__/animation.cpython-311.pyc
 simulation_results/animation.mp4
 simulation_results/planet.png
 simulation_results/planetbefore.png
