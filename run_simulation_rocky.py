@@ -21,7 +21,7 @@ import numpy as np
 
 # model evolution
 timestep = 1 | units.hour
-simulation_duration = 5 | units.day
+simulation_duration = 10 | units.day
 
 # ----------------------CREATE THE PLANET----------------------
 
@@ -30,7 +30,7 @@ simulation_duration = 5 | units.day
 
 planet_mass = 1 | units.MEarth
 planet_radius = 1 | units.REarth
-atmosphere_profile = AP.true_profile
+atmosphere_profile = AP.true_profile #wether this works is dependant on your system and the initialization of the particles. If it doesn't work, try the other profile such as AP.barometric_profile
 atmosphere_height = 100|units.km
 atmosphere_density = 1.225 | units.kg * units.m** (-3)
 num_points = 50000
@@ -154,7 +154,7 @@ bridge.timestep = timestep
 
 
 
-path_results = f'simulation_results/Earth_planet_{atmosphere_speed}ms/'
+path_results = f'simulation_results/Earth_planet_{atmosphere_speed}ms_long/'
 if not os.path.exists(path_results):
     os.mkdir(path_results)
 
