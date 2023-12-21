@@ -101,7 +101,8 @@ Run any of the following files to analyse the simulation
     python3 analysis_tools/hill_sphere.py
     python3 analysis_tools/plot_system.py
 ```
-* or ```bash python3 analysis_tools/accreted_fraction_rocky.py``` for the gas planet.
+\* or ```bash python3 analysis_tools/accreted_fraction_rocky.py``` for the gas planet.
+  
 IMPORTANT! it is important to run this from the main directory and not from the analysis_tools directory. Some files require them to be run from the main directory. For a smooth simulation please run any of the files from the main directory to avoid path errors. 
 
 
