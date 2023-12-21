@@ -31,12 +31,13 @@ class Animator:
 
 
     """
-    def __init__(self, path_simulation_results, xlabel, ylabel, xlim=0.1, ylim=0.1):
+    def __init__(self, path_simulation_results, xlabel, ylabel, center='planet', xlim=0.05, ylim=0.05):
         self.xlabel = xlabel
         self.ylabel = ylabel
         self.xlim = (-xlim, xlim)
         self.ylim = (-ylim, ylim)
         self.data_path = path_simulation_results
+        self.center = center
         self.n_frames = self.count_files()
     
     def count_files(self):
@@ -67,7 +68,12 @@ class Animator:
         gas_particles = read_set_from_file(filename_gas)
         dm_particles = read_set_from_file(filename_dm)
         gravity_particles = read_set_from_file(filename_gravity)
-
+        
+        if self.center=="moon":
+            gas_particles.position -= gravity_particles[0].position
+            dm_particles.position -= gravity_particles[0].position
+            gravity_particles[1].position -= gravity_particles[0].position
+            gravity_particles[0].position = [0, 0, 0] | units.m
         # print(len(x_positions), len(y_positions))
         self.ax.scatter(dm_particles.x.value_in(units.AU), dm_particles.y.value_in(units.AU), color='darkred', label='planet core', s=10)
         self.ax.scatter(gas_particles.x.value_in(units.AU), gas_particles.y.value_in(units.AU), color='indianred', label='planet atmosphere/envelope', s=5)
