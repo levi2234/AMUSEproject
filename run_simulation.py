@@ -31,14 +31,17 @@ moon_mass = 20 | units.MEarth # 10 x mass Io
 # distance_planet_moon = 671000 | units.km # distance Europa from jupiter
 distance_planet_moon = 421600 | units.km # distance Io and Jupiter
 eccentricity_moon = 0 # 0.009 for Europa, 0.004 for Io, but close enough to 0.
-R_hill_moon=1.07*1e8
+R_hill_moon = 1.07*1e8 # TODO: change this to not hardcoded, also don't do anything with this, can I remove it?
 
 # explosion
 outer_fraction = 0.9
 #explosion_energy = 6.1e+42|units.erg
-explosion_energies= np.arange(1,10.1,0.3)*1e42|units.erg
+explosion_energies = np.arange(1,10.1,0.3)*1e42|units.erg
+explosion_energies = explosion_energies[5:6]
+
 # model evolution
 for explosion_energy in explosion_energies:
+    print('Run for explosion energy = ', explosion_energy.in_(units.erg))
     timestep = 0.5 | units.hour
     simulation_duration = 4 | units.day
 
@@ -71,20 +74,19 @@ for explosion_energy in explosion_energies:
     system = new_binary_from_orbital_elements(planet_mass, moon_mass, distance_planet_moon, eccentricity_moon, G = constants.G)
 
     #move most massive object to 0,0,0
-    system.position = system.position -system[0].position
+    system.position = system.position - system[0].position
 
     #add moon to own particle set (could be done better but this only works for 2 objects)
     moon = Particles(1)
     moon.mass = moon_mass
     moon.position = system[1].position
     moon.velocity = system[1].velocity
-    print(moon.velocity.in_(units.kms))
-    moon_radius= 2e6 #in meters
-
+    moon.radius = 2e6 | units.m # TODO: add based on what? or specify in top part of code
+    print(moon.velocity.value_in(units.m/units.s))
     system = new_binary_from_orbital_elements(planet_mass, 1|units.MSun, 1|units.AU, 0, G = constants.G)
 
     #move most massive object to 0,0,0
-    system.position = system.position -system[0].position
+    system.position = system.position - system[0].position
 
     #add moon to own particle set (could be done better but this only works for 2 objects)
     sun = Particles(1)
@@ -126,8 +128,11 @@ for explosion_energy in explosion_energies:
     bridge.timestep = timestep
 
 
-
-    path_results = 'simulation_results/energies_results/{}/'.format(explosion_energy,'g')
+    path_base = 'simulation_results/energies_results2/'
+    path_results = path_base + '{:.2e}_erg/'.format(explosion_energy.value_in(units.erg),'g')
+    print(path_results)
+    if not os.path.exists(path_base):
+        os.mkdir(path_base)
     if not os.path.exists(path_results):
         os.mkdir(path_results)
 
@@ -138,16 +143,20 @@ for explosion_energy in explosion_energies:
     #systemplotter(hydro_code.gas_particles, xlabel='x', ylabel='y').plot(save="simulation_results/planetbefore.png", c="b",s=2, close=False)
     #systemplotter(gravity_code.particles, xlabel='x', ylabel='y').plot(save="simulation_results/planetbefore.png", c="r",s=40, close=False)
     #systemplotter(hydro_code.dm_particles, xlabel='x', ylabel='y').plot(save="simulation_results/testplanetBefore.png", c="r",s=20)
-
+    energy_conservation = []
 
     #----------------------RUN THE SIMULATION----------------------
+    initial_energy = (hydro_code.get_total_energy() + gravity_code.get_total_energy())
     while (hydro_code.model_time < simulation_duration):
         #hydro_code.evolve_model(hydro_code.model_time + bridge.timestep)
         bridge.evolve_model(hydro_code.model_time + bridge.timestep)
+        dE = initial_energy/(hydro_code.get_total_energy() + gravity_code.get_total_energy())
 
-        #print('Time=', hydro_code.model_time.in_(units.hour))
+        print('Time=', hydro_code.model_time.in_(units.hour))
+        print('dE = ', dE)
+        energy_conservation.append(dE)
         if (hydro_code.model_time.value_in(units.hour) >= 24) & (triggered_injection == False): #do something at the 6th timestep( 6 hours in)   
-            #inject energy
+            # inject energy
             
             triggered_injection = True
             print("injecting energy")
@@ -157,28 +166,30 @@ for explosion_energy in explosion_energies:
             print(explosion_radius.in_(units.RJupiter))
 
             inject_energy.inject_explosion_energy(hydro_code.gas_particles,explosion_energy=explosion_energy, exploding_region=explosion_radius)
-            
+            # initial_energy = hydro_code.get_total_energy() + gravity_code.get_total_energy()
         
         write_set_to_file(hydro_code.gas_particles, path_results+f'gas_particles_{index}.hdf5', overwrite_file=True)
         write_set_to_file(hydro_code.dm_particles, path_results+f'dm_particles_{index}.hdf5', overwrite_file=True)
         write_set_to_file(gravity_code.particles, path_results+f'gravity_particles_{index}.hdf5', overwrite_file=True)
-
+        
         index += 1
+    with open(path_results+'energy_conservation', 'wb') as file:
+        pickle.dump(energy_conservation, file)
 
-    #----------------------AFTER PLOT-----------------------
-    # systemplotter(hydro_code.gas_particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="b",s=2, close=False)
-    # systemplotter(gravity_code.particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="r",s=40, close=False)
-    # systemplotter(hydro_code.dm_particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="r",s=20)
+        #----------------------AFTER PLOT-----------------------
+        # systemplotter(hydro_code.gas_particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="b",s=2, close=False)
+        # systemplotter(gravity_code.particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="r",s=40, close=False)
+        # systemplotter(hydro_code.dm_particles, xlabel='x', ylabel='y').plot(save="simulation_results/endplot.png", c="r",s=20)
 
 
-    #----------------------STOP THE SIMULATION-----------------------
+        #----------------------STOP THE SIMULATION-----------------------
     hydro_code.stop()
     gravity_code.stop()
 
 
-    #path = 'simulation_results/jupiterlike_planettest_fast/'
-    #animator = Animator(path, xlabel='x', ylabel='y', xlim=0.005, ylim=0.005)
-    #animator.make_animation(save_path='simulation_results/animation_jup_2.mp4')
+    # save_path = 'simulation_results/animation_{}.mp4/'.format(explosion_energy,'g')
+    # animator = Animator(path_results, xlabel='x', ylabel='y', xlim=0.005, ylim=0.005)
+    # animator.make_animation(save_path=save_path)
 
 
 
