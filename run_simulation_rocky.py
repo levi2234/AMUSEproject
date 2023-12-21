@@ -154,7 +154,7 @@ bridge.timestep = timestep
 
 
 
-path_results = f'simulation_results/Earth_planet_{atmosphere_speed}ms_long/'
+path_results = f'simulation_results/rocky_results/Earth_planet_{atmosphere_speed}ms/'
 if not os.path.exists(path_results):
     os.mkdir(path_results)
 

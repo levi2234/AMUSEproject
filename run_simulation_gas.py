@@ -127,7 +127,7 @@ for explosion_energy in explosion_energies:
 
 
 
-    path_results = 'simulation_results/energies_results/{}/'.format(explosion_energy,'g')
+    path_results = 'simulation_results/gas_results/{}/'.format(explosion_energy,'g')
     if not os.path.exists(path_results):
         os.mkdir(path_results)
 
