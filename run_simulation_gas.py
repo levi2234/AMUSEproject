@@ -26,9 +26,7 @@ target_core_mass = 300 | units.MEarth # 0.5 | units.MJupiter
 pickle_file = 'simulation_tools/profiles/jupiter_like_planet_structure.pkl' # insert planet profile name from mesa
 
 # characteristics of the moon
-# moon_mass = 0.008 | units.MEarth # mass Europa, previously: 0.012*planet_mass
-moon_mass = 20 | units.MEarth # 10 x mass Io
-# distance_planet_moon = 671000 | units.km # distance Europa from jupiter
+moon_mass = 20 | units.MEarth 
 distance_planet_moon = 421600 | units.km # distance Io and Jupiter
 eccentricity_moon = 0 # 0.009 for Europa, 0.004 for Io, but close enough to 0.
 R_hill_moon=1.07*1e8
@@ -127,7 +125,7 @@ for explosion_energy in explosion_energies:
 
 
 
-    path_results = 'simulation_results/energies_results/{}/'.format(explosion_energy,'g')
+    path_results = 'simulation_results/gas_results/{}/'.format(explosion_energy,'g')
     if not os.path.exists(path_results):
         os.mkdir(path_results)
 
@@ -142,10 +140,8 @@ for explosion_energy in explosion_energies:
 
     #----------------------RUN THE SIMULATION----------------------
     while (hydro_code.model_time < simulation_duration):
-        #hydro_code.evolve_model(hydro_code.model_time + bridge.timestep)
         bridge.evolve_model(hydro_code.model_time + bridge.timestep)
 
-        #print('Time=', hydro_code.model_time.in_(units.hour))
         if (hydro_code.model_time.value_in(units.hour) >= 24) & (triggered_injection == False): #do something at the 6th timestep( 6 hours in)   
             #inject energy
             
