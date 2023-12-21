@@ -25,9 +25,6 @@ simulation_duration = 10 | units.day
 
 # ----------------------CREATE THE PLANET----------------------
 
-# for now create the model with planet_to_sph,
-# can only run after the profiles are complete in earth_profile/PREM.csv
-
 planet_mass = 1 | units.MEarth
 planet_radius = 1 | units.REarth
 atmosphere_profile = AP.true_profile #wether this works is dependant on your system and the initialization of the particles. If it doesn't work, try the other profile such as AP.barometric_profile
@@ -153,8 +150,10 @@ bridge.add_system(hydro_code, (gravity_code,)) #makes sure moon is also affected
 bridge.timestep = timestep
 
 
-
-path_results = f'simulation_results/rocky_results/Earth_planet_{atmosphere_speed}ms/'
+path_rocky_results = f'simulation-results/rocky_results/'
+path_results = path_rocky_results+f'Earth_planet_{atmosphere_speed}ms/'
+if not os.path.exists(path_rocky_results):
+    os.mkdir(path_rocky_results)
 if not os.path.exists(path_results):
     os.mkdir(path_results)
 
