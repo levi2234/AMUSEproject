@@ -1,7 +1,3 @@
-# to do:
-# add options to plot gas, dm and gravity particles, and read that in more efficiently
-# add options to more consistently work with units
-
 from analysis_tools.plot_system import systemplotter
 
 from matplotlib.animation import FuncAnimation

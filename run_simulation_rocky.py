@@ -150,7 +150,7 @@ bridge.add_system(hydro_code, (gravity_code,)) #makes sure moon is also affected
 bridge.timestep = timestep
 
 
-path_rocky_results = f'simulation-results/rocky_results/'
+path_rocky_results = f'simulation_results/rocky_results/'
 path_results = path_rocky_results+f'Earth_planet_{atmosphere_speed}ms/'
 if not os.path.exists(path_rocky_results):
     os.mkdir(path_rocky_results)

@@ -61,7 +61,7 @@ def add_binding_energy_attributes(gas_particles):
 if __name__ == "__main__": 
     
     #navigate to the directory where the h5 files is located relative to this file
-    os.chdir("../simulation_results/jupiterlike_planet") #change the folder to the folder where the h5 file is located
+    os.chdir("simulation_results/rocky_results/Earth_planet_12550/") #change the folder to the folder where the h5 file is located
     files = os.listdir() #list all files in the directory
 
 

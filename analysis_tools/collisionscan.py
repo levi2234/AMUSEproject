@@ -12,7 +12,7 @@ def collisionscan(velocity, radius):
     moon_radius =radius #in meters
     
 
-    folder_location = f'../simulation_results/Earth_planet_{velocity}ms'
+    folder_location = f'simulation_results/rocky_results/Earth_planet_{velocity}ms'
 
     number_of_files = len(os.listdir(folder_location))/3
 
@@ -43,7 +43,7 @@ def collisionscan(velocity, radius):
     number_of_collisions = np.sum(collisions, axis=1)
 
 
-    with open(f'../simulation_results/{radius}m.csv', 'a') as f:
+    with open(f'simulation_results/{radius}m.csv', 'a') as f:
         f.write(f'{velocity},{np.sum(number_of_collisions)},{np.sum(number_of_collisions)/len(collisions[0])},{number_of_collisions}\n')
     
 
