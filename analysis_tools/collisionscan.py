@@ -6,10 +6,12 @@ import os
 import matplotlib.pyplot as plt
 from concurrent.futures import ProcessPoolExecutor
 
-def collisionscan(velocity):
+def collisionscan(velocity, radius):
     print("Collisionscan for velocity: ", velocity)
     #CHANGE THESE values depending on the simulation
-    moon_radius = 1737.1e3 #in meters
+    moon_radius =radius #in meters
+    
+
     folder_location = f'../simulation_results/Earth_planet_{velocity}ms'
 
     number_of_files = len(os.listdir(folder_location))/3
@@ -33,21 +35,16 @@ def collisionscan(velocity):
         #calculate average moon velocity
         collision_bool = [cd.collision_detector(atmosphere_before[i].position.value_in(units.m), atmosphere_after[i].position.value_in(units.m), average_moon_location, moon_radius) for i in range(len(atmosphere_before))]
         collisions.append(collision_bool)
-        # print("Number of collisions: ", np.sum(collision_bool))
+        print("Number of collisions: ", np.sum(collision_bool))
         # print("Collisionbool: ", collision_bool)
 
     #add the velocity and number of collisions for each timestep to collisions.txt in a row as follows: velocity number_of_collisions_timestep1 number_of_collisions_timestep2 etc.
     collisions = np.array(collisions)
     number_of_collisions = np.sum(collisions, axis=1)
 
-    #add to a csv file and make one if it does not exist yet( add velocity, number of collisions total, fraction of collisions, number of collisions per timestep)
-    if os.path.isfile(f'../simulation_results/{velocity}ms.csv'):
-        with open(f'../simulation_results/{velocity}ms.csv', 'a') as f:
-            f.write(f'{velocity},{np.sum(number_of_collisions)},{np.sum(number_of_collisions)/len(number_of_collisions)},{number_of_collisions}\n')
-    else:
-        with open(f'../simulation_results/{velocity}ms.csv', 'w') as f:
-            f.write(f'Velocity,Number of collisions total,Fraction of collisions,Number of collisions per timestep\n')
-            f.write(f'{velocity},{np.sum(number_of_collisions)},{np.sum(number_of_collisions)/len(collisions[0])},{number_of_collisions}\n')
+
+    with open(f'../simulation_results/{radius}m.csv', 'a') as f:
+        f.write(f'{velocity},{np.sum(number_of_collisions)},{np.sum(number_of_collisions)/len(collisions[0])},{number_of_collisions}\n')
     
 
 
@@ -55,9 +52,15 @@ def collisionscan(velocity):
     
 #make a parallelized version of the code above
 
-velocities = [11800,12000,12100,12350, 12375, 12400, 12450,12475,12500,15250,12550,12575,12600,12700,12900,113200]
-with ProcessPoolExecutor(max_workers=6) as executor:
-    executor.map(collisionscan, velocities)
+for radius in np.linspace(1737.1e3, 384567780,10):
+    #make a csv file for each radius
+    if not os.path.isfile(f'../simulation_results/{radius}m.csv'):
+        with open(f'../simulation_results/{radius}m.csv', 'w') as f:
+            f.write(f'Velocity,Number of collisions total,Fraction of collisions,Number of collisions per timestep\n')
+    
+    velocities = [11800,12000,12100,12350, 12375, 12400, 12450,12475,12500,15250,12550,12575,12600,12700,12900,113200]
+    with ProcessPoolExecutor(max_workers=6) as executor:
+        executor.map(collisionscan,velocities,radius*np.ones(len(velocities)))
 
     
 

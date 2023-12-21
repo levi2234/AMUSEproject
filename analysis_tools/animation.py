@@ -31,11 +31,15 @@ class Animator:
 
 
     """
-    def __init__(self, path_simulation_results, xlabel, ylabel, center='planet', xlim=0.05, ylim=0.05):
+    def __init__(self, path_simulation_results, xlabel, ylabel, center='planet', xlim=0.1, ylim=0.1, s_planet = 40, s_moon=10, s_atmosphere=1, title=""):
         self.xlabel = xlabel
         self.ylabel = ylabel
         self.xlim = (-xlim, xlim)
         self.ylim = (-ylim, ylim)
+        self.s_planet = s_planet
+        self.s_moon = s_moon
+        self.title = title
+        self.s_atmosphere = s_atmosphere
         self.data_path = path_simulation_results
         self.center = center
         self.n_frames = self.count_files()
@@ -55,8 +59,6 @@ class Animator:
     def animate(self, i):
         self.ax.clear()
 
-        self.ax.set_xlim(self.xlim)
-        self.ax.set_ylim(self.ylim)
 
         self.ax.set_xlabel(self.xlabel)
         self.ax.set_ylabel(self.ylabel)
@@ -75,10 +77,18 @@ class Animator:
             gravity_particles[1].position -= gravity_particles[0].position
             gravity_particles[0].position = [0, 0, 0] | units.m
         # print(len(x_positions), len(y_positions))
-        self.ax.scatter(dm_particles.x.value_in(units.AU), dm_particles.y.value_in(units.AU), color='darkred', label='planet core', s=10)
-        self.ax.scatter(gas_particles.x.value_in(units.AU), gas_particles.y.value_in(units.AU), color='indianred', label='planet atmosphere/envelope', s=5)
-        self.ax.scatter(gravity_particles.x.value_in(units.AU), gravity_particles.y.value_in(units.AU), color='blue', label='moon')
+        self.ax.scatter(dm_particles.x.value_in(units.AU), dm_particles.y.value_in(units.AU), color='darkred', label='planet core', s=self.s_planet)
+        self.ax.scatter(gas_particles.x.value_in(units.AU), gas_particles.y.value_in(units.AU), color='indianred', label='planet atmosphere/envelope', s=self.s_atmosphere)
+        self.ax.scatter(gravity_particles[0].x.value_in(units.AU), gravity_particles[0].y.value_in(units.AU), color='blue', label='moon', s=self.s_moon)
         self.ax.legend()
+        self.ax.set_ylabel('AU')
+        self.ax.set_xlabel('AU')
+        
+        #get heaviest particle
+        self.ax.set_title(self.title)
+        self.ax.set_xlim(dm_particles[0].x.value_in(units.AU) + self.xlim[0],dm_particles[0].x.value_in(units.AU) + self.xlim[1])
+        self.ax.set_ylim(dm_particles[0].y.value_in(units.AU) + self.xlim[0],dm_particles[0].y.value_in(units.AU) + self.xlim[1])
+
 
     def make_animation(self, show=False, save_path=None):
         self.fig, self.ax = plt.subplots()
