@@ -72,7 +72,7 @@ This brings us to the _analyis tools_ folder which contains the following files:
 - _binding_energy.py_ - This file calculates the binding energy of the atmosphere and the moon. The binding energy is calculated for each timestep and stored in a new column in the .hdf5 file of the specific timestep. In this column a boolean is stored indicating wether a particle is bound to the moon or not, and similarly for the planet and the atmsophere.
 - _collisiondetector.py_ - This file contains the collision detector function. This function detects wether the line between two particle locations intersects with a sphere. This is used to calculate wether a particle has collided with the moon between or in a timestep. 
 - collisionscan.py - This file puts the _collsiondetector.py_ to use and scans the simulation for collisions. It stores the results in a .csv file in the _simulation_results_ folder under the velocity its name.
-- _collisions_probabalistic.py_ - Andres fill this please with a discription
+- _collisions_probabalistic.py_ - This file contains a function that checks the number of particles that reach the Hill sphere of the moon and stores their velocities. Then, another function computes the probability distribution of those velocities, makes a Gaussian fit and computes the probability of a particle having 0 velocity inside the Hill sphere. 
 - _hill_sphere.py_ - Esther fill this please with a discription
 - ParticleProfileAnim.py - This file creates an animation of the particles in a simulation. Changing the parameters in the file allows for different animations. The animation returns a videofile showing the density distribution and internal energy distribution of the particles. This file is stored in the _simulation_results_ folder under the velocity its name.
 - _plot_system.py_ - This file contains the code to plot a AMUSE particle set. It builds on the matplotlib library and is used to plot the system at a given timestep. This is mainly for visualisation during the development of the simulation.
@@ -97,10 +97,12 @@ Run any of the following files to analyse the simulation
     python3 analysis_tools/animation.py
     python3 analysis_tools/binding_energy.py
     python3 analysis_tools/collisionscan.py
-    python3 analysis_tools/collisions_probabalistic.py
+    python3 analysis_tools/accreted_fraction_rocky.py *
     python3 analysis_tools/hill_sphere.py
     python3 analysis_tools/plot_system.py
 ```
+\* or ```bash python3 analysis_tools/accreted_fraction_rocky.py``` for the gas planet.
+  
 IMPORTANT! it is important to run this from the main directory and not from the analysis_tools directory. Some files require them to be run from the main directory. For a smooth simulation please run any of the files from the main directory to avoid path errors. 
 
 
