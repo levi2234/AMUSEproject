@@ -17,8 +17,7 @@ from amuse.units import units
 import os
 
 def setup_stellar_evolution_model():
-    out_pickle_file = 'profiles/jupiter_like_planet_structure.pkl'# os.path.join(get_path_to_results(), 
-                                   # "super_giant_stellar_structure.pkl")
+    out_pickle_file = 'simulation_tools/profiles/jupiter_like_planet_structure.pkl'
 
     stellar_evolution = MESA(redirection="none")
     stars = Particles(1)
