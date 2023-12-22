@@ -15,12 +15,12 @@ explosion_energies=np.arange(1,10.1,0.3)*1e42|u.erg
 N_particles=2000 #number of particles in the hydro code
 R_hill=1.18*10**8 #hill radius of the moon in the gas giant system
 
-current_dir=os.getcwd()
-accreted_fraction={}
+current_dir = os.getcwd()
+accreted_fraction = {}
 if __name__ == "__main__": 
     for impact_energy in explosion_energies:
         #navigate to the directory where the h5 files is located relative to this file
-        os.chdir("../simulation_results/gas_results/{}".format(impact_energy,'g')) 
+        os.chdir("simulation_results/gas_results/{:.1e}_erg".format(impact_energy.value_in(u.erg),'g')) 
         files = os.listdir() #list all files in the directory
 
 
@@ -50,6 +50,12 @@ if __name__ == "__main__":
             
         os.chdir(current_dir)
         
+        # check if directories exist that we want to save our plots in
+        if not os.path.exists('simulation_results/earth_0.01ratio'):
+            os.mkdir('simulation_results/earth_0.01ratio')
+        if not os.path.exists('simulation_results/jupiter_0.05ratio'):
+            os.mkdir('simulation_results/jupiter_0.05ratio')
+        
         # calculation of the probability distributions and Gaussian fits
         if total_collisions != 0:
             velocities,empirical_cdf,normal_cdf,pvalue,probability_v0=\
@@ -65,13 +71,13 @@ if __name__ == "__main__":
                 plt.ylabel('Cumulative distribution function')
                 plt.text(0.6, 0.5, f'p-value$={pvalue}$', transform=plt.gca().transAxes)
                 plt.legend()
-                plt.savefig('../simulation_results/earth_0.01ratio/CDF{}.png'.format(impact_energy,'g'))
+                plt.savefig('simulation_results/earth_0.01ratio/CDF{}.png'.format(impact_energy,'g'))
                 plt.clf()
                 plt.hist(velocities,density=True)
                 plt.xlabel('Velocity [m/s]')
                 plt.ylabel('Density')
                 plt.title('{}'.format(impact_energy,'g'))
-                plt.savefig('../simulation_results/jupiter_0.05ratio/PDF{}.png'.format(impact_energy,'g'))
+                plt.savefig('simulation_results/jupiter_0.05ratio/PDF{}.png'.format(impact_energy,'g'))
                 plt.clf()           
     energies = list(map(float, accreted_fraction.keys()))
     fractions = list(accreted_fraction.values())
@@ -93,6 +99,6 @@ if __name__ == "__main__":
     plt.xlim(8e41,1.85e43)
     custom_ticks = [1e42, 5e42, 1e43]
     plt.xticks(custom_ticks, [f'{tick:.0e}' for tick in custom_ticks])
-    plt.savefig('../simulation_results/jupiter_0.05ratio/fraction_jupiter.png')
+    plt.savefig('simulation_results/jupiter_0.05ratio/fraction_jupiter.png')
 
     

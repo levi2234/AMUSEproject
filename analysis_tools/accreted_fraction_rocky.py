@@ -21,7 +21,7 @@ accreted_fraction={}
 if __name__ == "__main__": 
     for impact_energy in explosion_energies:
         #navigate to the directory where the h5 files is located relative to this file
-        os.chdir("../simulation_results/rocky_results/Earth_planet_{}ms".format(impact_energy,'g'))  
+        os.chdir("simulation_results/rocky_results/Earth_planet_{}ms".format(impact_energy,'g'))  
         files = os.listdir() #list all files in the directory
 
 
@@ -50,6 +50,10 @@ if __name__ == "__main__":
 
         os.chdir(current_dir)
         
+        # check if directories exist that we want to save our plots in
+        if not os.path.exists('simulation_results/earth_0.01ratio'):
+            os.mkdir('simulation_results/earth_0.01ratio')
+            
         # Calculation of the probability distributions and Gaussian fits
         if total_collisions != 0:
             velocities,empirical_cdf,normal_cdf,pvalue,probability_v0=\
@@ -64,13 +68,13 @@ if __name__ == "__main__":
                 plt.ylabel('Cumulative distribution function')
                 plt.text(0.6, 0.5, f'p-value$={pvalue}$', transform=plt.gca().transAxes)
                 plt.legend()
-                plt.savefig('../simulation_results/earth_0.01ratio/CDF{}.png'.format(impact_energy,'g'))
+                plt.savefig('simulation_results/earth_0.01ratio/CDF{}.png'.format(impact_energy,'g'))
                 plt.clf()
                 plt.hist(velocities,density=True)
                 plt.xlabel('Velocity [m/s]')
                 plt.ylabel('Density')
                 plt.title('{}'.format(impact_energy,'g'))
-                plt.savefig('../simulation_results/earth_0.01ratio/PDF{}.png'.format(impact_energy,'g'))
+                plt.savefig('simulation_results/earth_0.01ratio/PDF{}.png'.format(impact_energy,'g'))
                 plt.clf()           
     energies = list(map(float, accreted_fraction.keys()))
     fractions = list(accreted_fraction.values())
@@ -89,5 +93,5 @@ if __name__ == "__main__":
     plt.ylabel('Captured mass fraction')
     plt.title('Fraction of the ejected atmosphere captured by the moon') 
     plt.xlim(11500,14100)
-    plt.savefig('../simulation_results/earth_0.01ratio/fraction_earth.png')
+    plt.savefig('simulation_results/earth_0.01ratio/fraction_earth.png')
     
