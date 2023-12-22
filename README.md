@@ -51,13 +51,13 @@ Here the 12550 is the radial velocity in m/s.
 
 These simulations make use of the _simulation_tools_ folder. This folder contains the following files:
 
-- _create_atmosphere.py_ - This file creates the atmosphere for the rocky planet simulation given a radius and a atmospheric profile. It uses density and temperature profiles to create the atmosphere by sampling a profile form the _profiles/atmospheric_profiles.py_ function. This function is used in the _run_simulation_rocky.py_ file to create the atmosphere.
+- _create_atmosphere.py_ - This file creates the atmosphere for the rocky planet simulation given a radius and an atmospheric profile. It uses density and temperature profiles to create the atmosphere by sampling a profile from the _profiles/atmospheric_profiles.py_ function. This function is used in the _run_simulation_rocky.py_ file to create the atmosphere.
 
 - _create_bare_planet.py_ - This file creates a bare planet for the rocky planet simulation. It creates a planet with a given radius and a given mass. This function is used in the _run_simulation_rocky.py_ file to create the planet. It takes a range of parameters used to describe the central planet
 
 - _create_planet_and_atmosphere.py_ - This file creates a planet and an atmosphere for the rocky planet simulation. It uses the aforementioned files to create a planet and an atmosphere in such a way that they are coupled. This function is used in the _run_simulation_rocky.py_ file to create the planet and the atmosphere.
 
-- _create_planet.py_ - This file creates a planet for the gas giant simulation. It uses MESA to create an interior structure for a gas giant planet. The resulting file _simulation_tools/profiles/jupiter_like_planet_structure.pkl_ is already present, so it's not necessary to run this file again.
+- _create_planet.py_ - This file creates a planet for the gas giant simulation. It uses MESA to create an interior structure for a gas giant planet. The resulting file _simulation_tools/profiles/jupiter_like_planet_structure.pkl_ is already present, so it's not necessary to run this script again.
 
 - _inject_energy.py_ - This file injects energy into the atmosphere of the gas planet simulation given a certain energy. This function is used in the _run_simulation_gas.py_ file to inject energy into the atmosphere. 
 
