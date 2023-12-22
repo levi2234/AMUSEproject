@@ -10,12 +10,15 @@ from amuse.datamodel import Particles
 import os
 from amuse.io import read_set_from_file
 from amuse.io import write_set_to_file
+from hill_sphere import hill_radius
 
 explosion_energies=[11800,12000,12100,12100,12350,12375,
                     12400,12450,12475,12500,12525,12550,12575,12600,12700,12900,13200]
 N_particles=50000 #number of particles in the hydro code
-R_hill=6.15*10**7 #hill radius of the moon in the gas giant system
-
+m_moon=7.347*10**22
+m_planet=5.972*10**24
+semi_major_axis=384400000 
+R_hill=hill_radius(m_moon,m_planet,semi_major_axis,0)
 current_dir=os.getcwd()
 accreted_fraction={}
 if __name__ == "__main__": 
