@@ -99,6 +99,7 @@ Run any of the following files to analyse the simulation
     python3 analysis_tools/collisionscan.py
     python3 analysis_tools/accreted_fraction_rocky.py *
     python3 analysis_tools/make_velocity_plots.py
+    python3 data_analysis.py
 ```
 \* or ```bash python3 analysis_tools/accreted_fraction_gas.py``` for the gas planet.
   
