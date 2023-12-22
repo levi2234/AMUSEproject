@@ -68,7 +68,7 @@ for explosion_energy in explosion_energies:
     system = new_binary_from_orbital_elements(planet_mass, moon_mass, distance_planet_moon, eccentricity_moon, G = constants.G)
 
     #move most massive object to 0,0,0
-    system.position = system.position -system[0].position
+    system.position = system.position - system[0].position
 
     #add moon to own particle set (could be done better but this only works for 2 objects)
     moon = Particles(1)
@@ -81,7 +81,7 @@ for explosion_energy in explosion_energies:
     system = new_binary_from_orbital_elements(planet_mass, 1|units.MSun, 1|units.AU, 0, G = constants.G)
 
     # move most massive object to 0,0,0
-    system.position = system.position -system[0].position
+    system.position = system.position - system[0].position
 
     # add sun to own particle set (could be done better but this only works for 2 objects)
     sun = Particles(1)
