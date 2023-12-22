@@ -54,8 +54,8 @@ def collisionscan(velocity, radius):
 
 for radius in np.linspace(1737.1e3, 384567780,10):
     #make a csv file for each radius
-    if not os.path.isfile(f'../simulation_results/{radius}m.csv'):
-        with open(f'../simulation_results/{radius}m.csv', 'w') as f:
+    if not os.path.isfile(f'simulation_results/{radius}m.csv'):
+        with open(f'simulation_results/{radius}m.csv', 'w') as f:
             f.write(f'Velocity,Number of collisions total,Fraction of collisions,Number of collisions per timestep\n')
     
     velocities = [11800,12000,12100,12350, 12375, 12400, 12450,12475,12500,15250,12550,12575,12600,12700,12900,113200]
