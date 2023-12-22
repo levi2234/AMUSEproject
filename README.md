@@ -1,7 +1,7 @@
 # 1. Astronomical Simulation Project
 
 
-This repository contains the code and documentation for an astronomical simulation project that aims to simulate the ejection of a planet's atmosphere and the subsequent capture of that atmosphere by the planet's moon. The project is being conducted as part of the fulfillment of the AMUSE (Astronomy Multi-purpose Software Environment) course requirements.
+This repository contains the code and documentation for an astronomical simulation project that aims to simulate the ejection of a planet's atmosphere and the subsequent capture of that atmosphere by the planet's moon. The project is being conducted as part of the fulfilment of the AMUSE (Astronomy Multi-purpose Software Environment) course requirements.
 
 ## 1.1. Project Team
 - Levi van Es - s2115409  
@@ -51,31 +51,32 @@ Here the 12550 is the radial velocity in m/s.
 
 These simulations make use of the _simulation_tools_ folder. This folder contains the following files:
 
-- _create_atmosphere.py_ - This file creates the atmosphere for the rocky planet simulation given a radius and a atmospheric profile. It uses density and temperature profiles to create the atmosphere by sampling a profile form the _profiles/atmospheric_profiles.py_ function. This function is used in the _run_simulation_rocky.py_ file to create the atmosphere.
+- _create_atmosphere.py_ - This file creates the atmosphere for the rocky planet simulation given a radius and an atmospheric profile. It uses density and temperature profiles to create the atmosphere by sampling a profile from the _profiles/atmospheric_profiles.py_ function. This function is used in the _run_simulation_rocky.py_ file to create the atmosphere.
 
 - _create_bare_planet.py_ - This file creates a bare planet for the rocky planet simulation. It creates a planet with a given radius and a given mass. This function is used in the _run_simulation_rocky.py_ file to create the planet. It takes a range of parameters used to describe the central planet
 
 - _create_planet_and_atmosphere.py_ - This file creates a planet and an atmosphere for the rocky planet simulation. It uses the aforementioned files to create a planet and an atmosphere in such a way that they are coupled. This function is used in the _run_simulation_rocky.py_ file to create the planet and the atmosphere.
 
-- _create_planet.py_ - This file creates a planet for the gas giant simulation. It uses pregenerated MESA models to create a planet. This function is used in the _run_simulation_gas.py_ file to create the planet.
+- _create_planet.py_ - This file creates a planet for the gas giant simulation. It uses MESA to create an interior structure for a gas giant planet. The resulting file _simulation_tools/profiles/jupiter_like_planet_structure.pkl_ is already present, so it's not necessary to run this script again.
 
 - _inject_energy.py_ - This file injects energy into the atmosphere of the gas planet simulation given a certain energy. This function is used in the _run_simulation_gas.py_ file to inject energy into the atmosphere. 
 
 
 ## 1.7 Post Simulation Analysis
-After running the simulation, the results are stored in the _results_ folder. The results are stored in a .hdf5 file. From this location all the following analyses will be done.
+After running the simulation, the results are stored in the _simulation_results_ folder. The results are stored in a .hdf5 file. From this location, all the following analyses will be done.
 
 This brings us to the _analyis tools_ folder which contains the following files:
 
 -  _animation.py_  - This file creates an animation of the simulation. The animation is stored alongside the simulation folders in _simulation_results_.
-- AtmosphereProfilePlot.py - This file creates a atmosphere identical to the atmosphere of the rocky planet simulation. This atmosphere is then plotted in a density vs radius plot. This plot is stored in the _simulation_results_ folder under the velocity its name. This plot aims as a check to see if the atmosphere is created correctly.
-- _binding_energy.py_ - This file calculates the binding energy of the atmosphere and the moon. The binding energy is calculated for each timestep and stored in a new column in the .hdf5 file of the specific timestep. In this column a boolean is stored indicating wether a particle is bound to the moon or not, and similarly for the planet and the atmsophere.
-- _collisiondetector.py_ - This file contains the collision detector function. This function detects wether the line between two particle locations intersects with a sphere. This is used to calculate wether a particle has collided with the moon between or in a timestep. 
-- collisionscan.py - This file puts the _collsiondetector.py_ to use and scans the simulation for collisions. It stores the results in a .csv file in the _simulation_results_ folder under the velocity its name.
+- _AtmosphereProfilePlot.py_ - This file creates an atmosphere identical to the atmosphere of the rocky planet simulation. This atmosphere is then plotted in a density vs radius plot. This plot is stored in the _simulation_results_ folder under the velocity its name. This plot aims as a check to see if the atmosphere is created correctly.
+- _binding_energy.py_ - This file calculates the binding energy of the atmosphere and the moon. The binding energy is calculated for each timestep and stored in a new column in the .hdf5 file of the specific timestep. In this column, a boolean is stored indicating whether a particle is bound to the moon or not, and similarly for the planet and the atmosphere.
+- _collisiondetector.py_ - This file contains the collision detector function. This function detects whether the line between two particle locations intersects with a sphere. This is used to calculate whether a particle has collided with the moon between or in a timestep. 
+- _collisionscan.py_ - This file puts the _collsiondetector.py_ to use and scans the simulation for collisions. It stores the results in a .csv file in the _simulation_results_ folder under the velocity its name.
 - _collisions_probabalistic.py_ - This file contains a function that checks the number of particles that reach the Hill sphere of the moon and stores their velocities. Then, another function computes the probability distribution of those velocities, makes a Gaussian fit and computes the probability of a particle having 0 velocity inside the Hill sphere. 
-- _hill_sphere.py_ - Esther fill this please with a discription
-- ParticleProfileAnim.py - This file creates an animation of the particles in a simulation. Changing the parameters in the file allows for different animations. The animation returns a videofile showing the density distribution and internal energy distribution of the particles. This file is stored in the _simulation_results_ folder under the velocity its name.
+- _hill_sphere.py_ - This file contains functions to calculate the hill sphere of an AMUSE particle and calculates what particles are in the Hill sphere of the moon at a certain timestep. Additionally, it calculates the relative velocities and escape velocities of those particles with respect to the moon and planet. 
+- _ParticleProfileAnim.py_ - This file creates an animation of the particles in a simulation. Changing the parameters in the file allows for different animations. The animation returns a videofile showing the density distribution and internal energy distribution of the particles. This file is stored in the _simulation_results_ folder under the velocity its name.
 - _plot_system.py_ - This file contains the code to plot a AMUSE particle set. It builds on the matplotlib library and is used to plot the system at a given timestep. This is mainly for visualisation during the development of the simulation.
+- _make_velocity_plots.py_ - This file makes the final velocity plots that are shown in the report using the simulation results in the folder _simulation_results_.
 
 ## 1.8 Instruction typical simulation
 
@@ -94,14 +95,13 @@ or
 Run any of the following files to analyse the simulation
 
 ```bash
-    python3 analysis_tools/animation.py
     python3 analysis_tools/binding_energy.py
     python3 analysis_tools/collisionscan.py
     python3 analysis_tools/accreted_fraction_rocky.py *
-    python3 analysis_tools/hill_sphere.py
-    python3 analysis_tools/plot_system.py
+    python3 analysis_tools/make_velocity_plots.py
+    python3 data_analysis.py
 ```
-\* or ```bash python3 analysis_tools/accreted_fraction_rocky.py``` for the gas planet.
+\* or ```bash python3 analysis_tools/accreted_fraction_gas.py``` for the gas planet.
   
 IMPORTANT! it is important to run this from the main directory and not from the analysis_tools directory. Some files require them to be run from the main directory. For a smooth simulation please run any of the files from the main directory to avoid path errors. 
 
