@@ -68,6 +68,6 @@ def add_hill_sphere_attributes(gas_particles, rh_planet, rh_moon, dm_part, gravi
                 print('particle should be bound now')
         crossing_times_moon = radii_moon.value_in(units.m) / speeds_particles
         crossing_times_moon = (crossing_times_moon | units.s).value_in(units.hour)
-
+        # print('crossing_time_moon:', crossing_times_moon)
         return v_rel_particles, escape_velocities_moon, speeds_particles, escape_velocities_planet
     return None, None, None, None
